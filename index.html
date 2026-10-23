@@ -119,9 +119,9 @@
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3">
-        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-xs font-semibold">
-          <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> IA Vision Ativa
-        </div>
+        <button onclick="openApiKeyModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-key text-indigo-400"></i> API Gemini
+        </button>
 
         <button onclick="logout()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg transition-all flex items-center gap-1" title="Sair da Conta">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -150,6 +150,29 @@
       </div>
     </nav>
   </header>
+
+  <!-- API KEY MODAL -->
+  <div id="apiKeyModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 border border-slate-800 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-white text-base flex items-center gap-2">
+          <i class="fa-solid fa-key text-indigo-400"></i> Chave API Google Gemini
+        </h3>
+        <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Cole abaixo sua chave gratuita obtida no <a href="https://aistudio.google.com/" target="_blank" class="text-indigo-400 underline">Google AI Studio</a> (começa com <b>AIzaSy...</b>).
+      </p>
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Gemini API Key</label>
+        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeApiKeyModal()" class="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl">Cancelar</button>
+        <button onclick="saveApiKey()" class="px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl">Salvar Chave</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Main Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -262,7 +285,7 @@
       </div>
     </section>
 
-    <!-- TAB 2: SCANNER DE PRINTS (GEMINI AI VISION) -->
+    <!-- TAB 2: SCANNER DE PRINTS COM INSTRUÇÃO EDITÁVEL -->
     <section id="content-upload" class="tab-content hidden space-y-6">
       <div class="glass-card p-6 rounded-2xl border border-indigo-500/25 space-y-6">
         <div class="max-w-3xl">
@@ -271,7 +294,7 @@
           </div>
           <h2 class="text-2xl font-bold text-white mb-2">Upload e Leitura Automática de Prints</h2>
           <p class="text-slate-400 text-sm leading-relaxed">
-            Selecione o aplicativo e envie seu print. O modelo Gemini lerá automaticamente os horários, valores e status aplicando a <b>trava anti-duplicação</b>.
+            Selecione a plataforma, personalize as instruções para a IA (se necessário) e envie seu print.
           </p>
         </div>
 
@@ -287,8 +310,17 @@
           </div>
         </div>
 
+        <!-- CAMPO DE PROMPT CUSTOMIZÁVEL PARA A IA -->
         <div class="space-y-2">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">2. Envie o Print ou Extrato:</label>
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">2. Instrução Personalizada para a IA (O que ela deve ler no print):</label>
+            <button onclick="resetCustomPrompt()" class="text-xs text-indigo-400 hover:underline"><i class="fa-solid fa-rotate-left"></i> Restaurar Padrão</button>
+          </div>
+          <textarea id="customPromptInput" rows="3" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none" placeholder="Ex: Leia apenas os valores do dia de hoje e ignore cancelamentos..."></textarea>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">3. Envie o Print ou Extrato:</label>
           <div class="border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-900/50 hover:bg-slate-900/80 rounded-2xl p-8 text-center cursor-pointer relative group transition-all" id="dropZone">
             <input type="file" id="fileInput" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
             <div class="space-y-3 pointer-events-none">
@@ -549,8 +581,22 @@
     let isSignUp = false;
     let currentUser = null;
 
+    const DEFAULT_PROMPT = `Analise o print enviado e extraia TODAS as corridas, viagens, recompensas ou taxas listadas.
+Retorne um JSON puro estrito contendo um array de objetos no formato:
+[
+  {
+    "platform": "Plataforma",
+    "date": "YYYY-MM-DD",
+    "time": "HH:MM",
+    "type": "Corrida",
+    "value": 14.50,
+    "distanceKm": 5.2,
+    "durationMin": 12
+  }
+]`;
+
     let appState = {
-      apiKey: "AQ.Ab8RN6JYZ9UtQ8JihBG7mrzbj2dN1gAFenzCPQw_apFKIytSFw", // Chave embutida e protegida
+      apiKey: localStorage.getItem('gemini_api_key') || '',
       selectedScanPlatform: 'Uber',
       vehicle: JSON.parse(localStorage.getItem('driver_vehicle')) || {
         name: 'Mottu Sport TVS HLX 150',
@@ -567,6 +613,27 @@
     };
 
     let platformChart = null;
+
+    function openApiKeyModal() {
+      document.getElementById('geminiApiKeyInput').value = appState.apiKey;
+      document.getElementById('apiKeyModal').classList.remove('hidden');
+    }
+
+    function closeApiKeyModal() {
+      document.getElementById('apiKeyModal').classList.add('hidden');
+    }
+
+    function saveApiKey() {
+      const key = document.getElementById('geminiApiKeyInput').value.trim();
+      appState.apiKey = key;
+      localStorage.setItem('gemini_api_key', key);
+      closeApiKeyModal();
+      showToast('Chave API salva com sucesso!', 'success');
+    }
+
+    function resetCustomPrompt() {
+      document.getElementById('customPromptInput').value = DEFAULT_PROMPT;
+    }
 
     function toggleAuthMode() {
       isSignUp = !isSignUp;
@@ -646,6 +713,8 @@
       const todayDateStr = new Date().toISOString().split('T')[0];
       const manualDateEl = document.getElementById('manualDate');
       if (manualDateEl) manualDateEl.value = todayDateStr;
+
+      document.getElementById('customPromptInput').value = DEFAULT_PROMPT;
 
       loadVehicleFormValues();
       renderDashboard();
@@ -772,9 +841,15 @@
       document.getElementById('calcResult').innerText = `R$ ${(km * target).toFixed(2)}`;
     }
 
-    // --- GEMINI VISION OCR API INTEGRATION (ROBUST) ---
+    // --- GEMINI VISION OCR API INTEGRATION ---
     async function handleFileUpload(files) {
       if (!files || !files.length) return;
+
+      if (!appState.apiKey) {
+        openApiKeyModal();
+        showToast('Insira sua chave de API Gemini primeiro.', 'warning');
+        return;
+      }
 
       const loader = document.getElementById('uploadLoader');
       const summary = document.getElementById('uploadSummary');
@@ -793,11 +868,14 @@
           const base64Data = await fileToBase64(file);
           const extractedRides = await processImageWithGemini(base64Data, file.type, targetPlatform);
           
+          if (extractedRides.length === 0) {
+            showToast(`Nenhuma corrida identificada em ${file.name}. Verifique a iluminação ou tente ajustar o prompt.`, 'warning');
+          }
+
           extractedRides.forEach(ride => {
             const todayStr = new Date().toISOString().split('T')[0];
             if (!ride.date) ride.date = todayStr;
             
-            // Trava rigorosa anti-duplicação por assinatura única
             const sigKey = `${ride.platform}_${ride.date}_${ride.time}_${parseFloat(ride.value).toFixed(2)}`;
             const isDuplicate = appState.rides.some(r => r.signatureKey === sigKey);
 
@@ -813,7 +891,7 @@
 
         } catch (error) {
           console.error("Erro OCR Gemini:", error);
-          showToast(`Erro ao ler o print. Use o lançamento manual.`, 'error');
+          showToast(`Erro na API: ${error.message}`, 'error');
         }
       }
 
@@ -855,25 +933,14 @@
 
     async function processImageWithGemini(base64ImageData, mimeType, platform) {
       const apiKey = appState.apiKey;
-      const todayStr = new Date().toISOString().split('T')[0];
+      const customPrompt = document.getElementById('customPromptInput').value || DEFAULT_PROMPT;
       
       const systemPrompt = `Você é um leitor de OCR especializado em extratos de aplicativos de transporte (${platform}).
-Analise o print enviado e extraia TODAS as corridas, viagens, recompensas ou taxas listadas.
-Retorne um JSON puro estrito contendo um array de objetos com o seguinte formato:
-[
-  {
-    "platform": "${platform}",
-    "date": "${todayStr}",
-    "time": "HH:MM",
-    "type": "Corrida", "Recompensa" ou "Cancelado",
-    "value": número ex: 14.50,
-    "distanceKm": número ex: 5.2,
-    "durationMin": número ex: 12
-  }
-]
-Retorne APENAS o JSON válido sem nenhum texto adicional ou formatação markdown.`;
+Instrução do Usuário: ${customPrompt}`;
 
-      const userPrompt = `Analise este print de extrato da ${platform} e extraia todas as viagens com precisão.`;
+      const userPrompt = `Analise este print da plataforma ${platform} e extraia as corridas em JSON puro.`;
+      
+      // Modelo Gemini 2.5 Flash / 1.5 Flash para visão computacional
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
       const payload = {
@@ -899,22 +966,16 @@ Retorne APENAS o JSON válido sem nenhum texto adicional ou formatação markdow
         }
       };
 
-      let response;
-      let retries = 0;
-      while (retries < 3) {
-        try {
-          response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          if (response.ok) break;
-        } catch (e) {}
-        retries++;
-        await new Promise(r => setTimeout(r, 1000 * retries));
-      }
+      let response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-      if (!response || !response.ok) throw new Error("Falha na API Gemini.");
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error?.message || "Verifique sua chave de API.");
+      }
 
       const result = await response.json();
       const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -924,6 +985,7 @@ Retorne APENAS o JSON válido sem nenhum texto adicional ou formatação markdow
         const jsonRides = JSON.parse(rawText);
         return Array.isArray(jsonRides) ? jsonRides : [];
       } catch (err) {
+        console.error("Erro no parse JSON:", rawText);
         return [];
       }
     }
