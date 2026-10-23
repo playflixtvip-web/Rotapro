@@ -118,19 +118,11 @@
         </div>
       </div>
 
-      <!-- Header Quick Actions -->
+      <!-- Header Quick Actions (Apenas Logout e Status Limpo) -->
       <div class="flex items-center gap-2 sm:gap-3">
-        <button onclick="loadDemoData()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span class="hidden sm:inline">Exemplo (22/10)</span>
-          <span class="sm:hidden">Demo</span>
-        </button>
-
-        <button onclick="openApiKeyModal()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-key text-indigo-400"></i>
-          <span class="hidden sm:inline">API Gemini</span>
-          <span id="apiKeyStatusDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
-        </button>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-xs font-semibold">
+          <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> IA Ativa
+        </div>
 
         <button onclick="logout()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg transition-all flex items-center gap-1" title="Sair da Conta">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -165,7 +157,6 @@
 
     <!-- TAB 1: DASHBOARD -->
     <section id="content-dashboard" class="tab-content space-y-6">
-      <!-- Period Selector Banner -->
       <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800">
         <div class="flex items-center gap-3">
           <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400">
@@ -185,51 +176,39 @@
         </div>
       </div>
 
-      <!-- Vehicle Overview Widget -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="vehicleQuickBar"></div>
 
-      <!-- Financial Metrics Cards Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Faturamento Bruto -->
         <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
-          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all"></div>
           <div class="flex justify-between items-start mb-2">
             <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Faturamento Bruto</span>
             <span class="p-2 bg-indigo-500/10 rounded-lg text-indigo-400"><i class="fa-solid fa-wallet"></i></span>
           </div>
           <div class="text-2xl font-black text-white" id="dashBruto">R$ 0,00</div>
-          <p class="text-xs text-slate-400 mt-2 flex items-center gap-1" id="dashTotalCorridasCount">
-            <i class="fa-solid fa-route"></i> 0 corridas finalizadas
-          </p>
+          <p class="text-xs text-slate-400 mt-2 flex items-center gap-1" id="dashTotalCorridasCount"><i class="fa-solid fa-route"></i> 0 corridas</p>
         </div>
 
-        <!-- Custos Totais -->
         <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
-          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition-all"></div>
           <div class="flex justify-between items-start mb-2">
             <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Custos Estimados</span>
             <span class="p-2 bg-rose-500/10 rounded-lg text-rose-400"><i class="fa-solid fa-gas-pump"></i></span>
           </div>
           <div class="text-2xl font-black text-rose-400" id="dashCustos">R$ 0,00</div>
-          <p class="text-xs text-slate-400 mt-2" id="dashCustosBreakdown">Combustível + Manutenção + Avulsos</p>
+          <p class="text-xs text-slate-400 mt-2" id="dashCustosBreakdown">Combustível + Manutenção</p>
         </div>
 
-        <!-- Lucro Líquido Real -->
         <div class="glass-card p-5 rounded-2xl relative overflow-hidden group border-emerald-500/30">
-          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
           <div class="flex justify-between items-start mb-2">
             <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Lucro Líquido Real</span>
             <span class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400"><i class="fa-solid fa-money-bill-trend-up"></i></span>
           </div>
           <div class="text-2xl font-black text-emerald-400" id="dashLucro">R$ 0,00</div>
-          <p class="text-xs text-emerald-500/80 mt-2 font-medium" id="dashMargemLucro">Margem: 0% do bruto</p>
+          <p class="text-xs text-emerald-500/80 mt-2 font-medium" id="dashMargemLucro">Margem: 0%</p>
         </div>
 
-        <!-- Rendimento por KM -->
         <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
-          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
           <div class="flex justify-between items-start mb-2">
-            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Ganhos por KM Rodado</span>
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Ganhos por KM</span>
             <span class="p-2 bg-amber-500/10 rounded-lg text-amber-400"><i class="fa-solid fa-gauge"></i></span>
           </div>
           <div class="text-2xl font-black text-amber-300" id="dashRendimentoKm">R$ 0,00 <span class="text-xs font-normal text-slate-400">/ km</span></div>
@@ -237,41 +216,28 @@
         </div>
       </div>
 
-      <!-- Platform Earnings Breakdown -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="glass-card p-5 rounded-2xl space-y-4">
-          <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider flex items-center justify-between">
-            <span>Faturamento por Plataforma</span>
-            <i class="fa-solid fa-layer-group text-slate-500"></i>
-          </h3>
+          <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider">Faturamento por Plataforma</h3>
           <div class="space-y-3">
             <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs border border-slate-700">UBER</div>
-                <div>
-                  <p class="text-sm font-semibold text-white">Uber App</p>
-                  <p class="text-xs text-slate-400" id="uberSubtext">0 corridas</p>
-                </div>
+                <div><p class="text-sm font-semibold text-white">Uber App</p><p class="text-xs text-slate-400" id="uberSubtext">0 corridas</p></div>
               </div>
               <span class="font-bold text-slate-200" id="uberTotal">R$ 0,00</span>
             </div>
             <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-amber-500 text-black flex items-center justify-center font-black text-xs">99</div>
-                <div>
-                  <p class="text-sm font-semibold text-white">99 Pop / Moto</p>
-                  <p class="text-xs text-slate-400" id="nineNineSubtext">0 corridas</p>
-                </div>
+                <div><p class="text-sm font-semibold text-white">99 Pop / Moto</p><p class="text-xs text-slate-400" id="nineNineSubtext">0 corridas</p></div>
               </div>
               <span class="font-bold text-slate-200" id="nineNineTotal">R$ 0,00</span>
             </div>
             <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-handshake"></i></div>
-                <div>
-                  <p class="text-sm font-semibold text-white">Particulares</p>
-                  <p class="text-xs text-slate-400" id="partSubtext">0 corridas</p>
-                </div>
+                <div><p class="text-sm font-semibold text-white">Particulares</p><p class="text-xs text-slate-400" id="partSubtext">0 corridas</p></div>
               </div>
               <span class="font-bold text-slate-200" id="partTotal">R$ 0,00</span>
             </div>
@@ -286,38 +252,12 @@
         </div>
 
         <div class="glass-card p-5 rounded-2xl space-y-4">
-          <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider flex items-center justify-between">
-            <span>Produtividade & Desempenho</span>
-            <i class="fa-solid fa-chart-line text-indigo-400"></i>
-          </h3>
-          <div class="space-y-3">
-            <div>
-              <div class="flex justify-between text-xs font-semibold mb-1">
-                <span class="text-slate-400">Taxa de Conclusão</span>
-                <span class="text-emerald-400" id="completionRate">100%</span>
-              </div>
-              <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
-                <div id="completionBar" class="h-full bg-emerald-500 transition-all" style="width: 100%"></div>
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3 pt-2">
-              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                <span class="text-xs text-slate-400 block mb-1">Total Horas</span>
-                <span class="text-lg font-bold text-slate-200" id="totalHours">0h 0m</span>
-              </div>
-              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                <span class="text-xs text-slate-400 block mb-1">KM Total</span>
-                <span class="text-lg font-bold text-slate-200" id="totalKmDashboard">0 km</span>
-              </div>
-              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                <span class="text-xs text-slate-400 block mb-1">Ticket Médio</span>
-                <span class="text-lg font-bold text-indigo-300" id="avgTicket">R$ 0,00</span>
-              </div>
-              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                <span class="text-xs text-slate-400 block mb-1">Ganho p/ Hora</span>
-                <span class="text-lg font-bold text-emerald-300" id="hourlyRate">R$ 0,00/h</span>
-              </div>
-            </div>
+          <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider">Produtividade</h3>
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span class="text-xs text-slate-400 block mb-1">Horas</span><span class="text-lg font-bold text-slate-200" id="totalHours">0h 0m</span></div>
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span class="text-xs text-slate-400 block mb-1">KM Total</span><span class="text-lg font-bold text-slate-200" id="totalKmDashboard">0 km</span></div>
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span class="text-xs text-slate-400 block mb-1">Ticket Médio</span><span class="text-lg font-bold text-indigo-300" id="avgTicket">R$ 0,00</span></div>
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span class="text-xs text-slate-400 block mb-1">Ganho/Hora</span><span class="text-lg font-bold text-emerald-300" id="hourlyRate">R$ 0,00/h</span></div>
           </div>
         </div>
       </div>
@@ -327,59 +267,41 @@
     <section id="content-upload" class="tab-content hidden space-y-6">
       <div class="glass-card p-6 rounded-2xl border border-indigo-500/20 space-y-6">
         <div class="max-w-3xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold mb-3">
-            <i class="fa-solid fa-brain"></i> Scanner Inteligente Vision Gemini AI
-          </div>
-          <h2 class="text-2xl font-bold text-white mb-2">Upload e Leitura Automática de Prints</h2>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Selecione o aplicativo e envie o print. Se houver restrição de rede no navegador móvel, utilize a aba <b>Lançamento Manual</b> para adicionar suas corridas com facilidade.
-          </p>
+          <h2 class="text-2xl font-bold text-white mb-2">Scanner Inteligente Vision Gemini AI</h2>
+          <p class="text-slate-400 text-sm leading-relaxed">Selecione o aplicativo e envie o print para leitura automática por IA.</p>
         </div>
 
         <div class="space-y-2">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">1. Selecione o Aplicativo do Print:</label>
-          <div class="flex flex-wrap gap-3">
-            <button type="button" onclick="setScanPlatform('Uber')" id="scanBtnUber" class="px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-black text-white border-indigo-500 shadow-lg shadow-indigo-500/20">
-              <span class="w-3 h-3 rounded-full bg-indigo-400"></span> Uber
-            </button>
-            <button type="button" onclick="setScanPlatform('99')" id="scanBtn99" class="px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-slate-900 text-slate-400 border-slate-800 hover:border-amber-500">
-              <span class="w-3 h-3 rounded-full bg-amber-500"></span> 99 (Junta Recompensas)
-            </button>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">1. Selecione o Aplicativo:</label>
+          <div class="flex gap-3">
+            <button type="button" onclick="setScanPlatform('Uber')" id="scanBtnUber" class="px-5 py-3 rounded-xl font-bold text-sm border bg-black text-white border-indigo-500 shadow-lg">Uber</button>
+            <button type="button" onclick="setScanPlatform('99')" id="scanBtn99" class="px-5 py-3 rounded-xl font-bold text-sm border bg-slate-900 text-slate-400 border-slate-800">99 (Junta Recompensas)</button>
           </div>
         </div>
 
         <div class="space-y-2">
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">2. Envie o Print:</label>
-          <div class="border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-900/50 hover:bg-slate-900/80 rounded-2xl p-8 text-center transition-all cursor-pointer relative group" id="dropZone">
+          <div class="border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-900/50 rounded-2xl p-8 text-center cursor-pointer relative" id="dropZone">
             <input type="file" id="fileInput" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
             <div class="space-y-3 pointer-events-none">
-              <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-              </div>
-              <div>
-                <p class="text-base font-semibold text-slate-200">Arraste seus prints aqui ou <span class="text-indigo-400 underline">clique para selecionar</span></p>
-                <p class="text-xs text-slate-500 mt-1">Suporta múltiplos arquivos PNG, JPG, WEBP</p>
-              </div>
+              <i class="fa-solid fa-cloud-arrow-up text-3xl text-indigo-400"></i>
+              <p class="text-sm font-semibold text-slate-200">Arraste seus prints ou clique para selecionar</p>
             </div>
           </div>
         </div>
 
-        <div id="uploadLoader" class="hidden bg-indigo-950/40 border border-indigo-800/50 p-5 rounded-2xl flex items-center gap-4">
-          <div class="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          <div>
-            <h4 class="font-semibold text-indigo-200 text-sm" id="loaderTitle">Analisando imagem com Gemini AI...</h4>
-            <p class="text-xs text-indigo-400" id="loaderSubtitle">Extraindo horários, valores e bônus...</p>
-          </div>
+        <div id="uploadLoader" class="hidden bg-indigo-950/40 border border-indigo-800 p-5 rounded-2xl flex items-center gap-4">
+          <div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-sm text-indigo-200" id="loaderTitle">Analisando imagem com Gemini AI...</span>
         </div>
 
-        <div id="uploadSummary" class="hidden p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3"></div>
+        <div id="uploadSummary" class="hidden p-4 rounded-2xl bg-slate-900 border border-slate-800"></div>
       </div>
     </section>
 
-    <!-- TAB 3: LANÇAMENTO MANUAL (Uber, 99 e Particular) -->
+    <!-- TAB 3: LANÇAMENTO MANUAL -->
     <section id="content-particular" class="tab-content hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Form Section -->
         <div class="lg:col-span-1 glass-card p-6 rounded-2xl space-y-4">
           <h3 class="font-bold text-lg text-white flex items-center gap-2">
             <i class="fa-solid fa-plus-circle text-emerald-400"></i> Adicionar Corrida Manual
@@ -387,75 +309,58 @@
           <form id="particularForm" onsubmit="saveManualRide(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-semibold text-slate-400 mb-1">Plataforma</label>
-              <select id="manualPlatform" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+              <select id="manualPlatform" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
                 <option value="Uber">Uber</option>
                 <option value="99">99 Pop</option>
                 <option value="Particular">Particular / Direct</option>
               </select>
             </div>
 
-            <div id="clientGroup">
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Nome do Cliente (Opcional p/ App, Obrigatório p/ Particular)</label>
-              <input type="text" id="manualClient" placeholder="Ex: João Silva ou Entrega" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Nome do Cliente (Opcional p/ App)</label>
+              <input type="text" id="manualClient" placeholder="Ex: João Silva" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Data</label>
-                <input type="date" id="manualDate" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+                <input type="date" id="manualDate" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Horário</label>
-                <input type="time" id="manualTime" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+                <input type="time" id="manualTime" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Valor (R$)</label>
-                <input type="number" step="0.01" id="manualValue" required placeholder="25.00" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+                <input type="number" step="0.01" id="manualValue" required placeholder="25.00" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Distância (KM)</label>
-                <input type="number" step="0.1" id="manualKm" placeholder="5.0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+                <input type="number" step="0.1" id="manualKm" placeholder="5.0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
               </div>
             </div>
 
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Observações</label>
-              <textarea id="manualObs" rows="2" placeholder="Ex: Corrida com bônus ou Pix" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"></textarea>
-            </div>
-
-            <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-floppy-disk"></i> Salvar Corrida Manual
+            <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition-all">
+              Salvar Corrida Manual
             </button>
           </form>
         </div>
 
-        <!-- Calculator & Manual List -->
         <div class="lg:col-span-2 space-y-6">
           <div class="glass-card p-6 rounded-2xl border border-emerald-500/20">
-            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
-              <i class="fa-solid fa-calculator text-emerald-400"></i> Calculadora de Preço por KM
-            </h3>
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-3">Calculadora de Preço por KM</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">KM Estimado</label>
-                <input type="number" id="calcKm" oninput="calculateEstimateFare()" placeholder="Ex: 15" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              </div>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">Sua Meta por KM (R$/KM)</label>
-                <input type="number" step="0.1" id="calcTargetKm" oninput="calculateEstimateFare()" value="2.50" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              </div>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">Sugestão de Cobrança</label>
-                <div class="h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3 flex items-center text-emerald-400 font-bold text-base" id="calcResult">R$ 0,00</div>
-              </div>
+              <div><input type="number" id="calcKm" oninput="calculateEstimateFare()" placeholder="Ex: 15" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"></div>
+              <div><input type="number" step="0.1" id="calcTargetKm" oninput="calculateEstimateFare()" value="2.50" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"></div>
+              <div class="h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3 flex items-center text-emerald-400 font-bold text-base" id="calcResult">R$ 0,00</div>
             </div>
           </div>
 
           <div class="glass-card p-6 rounded-2xl">
-            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-4">Últimas Corridas Lançadas Manualmente / Particulares</h3>
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-4">Corridas Recentes</h3>
             <div id="particularRidesList" class="space-y-3"></div>
           </div>
         </div>
@@ -466,81 +371,42 @@
     <section id="content-vehicle" class="tab-content hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-1 glass-card p-6 rounded-2xl space-y-4">
-          <h3 class="font-bold text-lg text-white flex items-center gap-2">
-            <i class="fa-solid fa-motorcycle text-amber-400"></i> Cadastro do Veículo
-          </h3>
+          <h3 class="font-bold text-lg text-white">Cadastro do Veículo</h3>
           <form id="vehicleForm" onsubmit="saveVehicleData(event)" class="space-y-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Nome / Modelo</label>
-              <input type="text" id="vehName" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Placa</label>
-              <input type="text" id="vehPlate" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-            </div>
+            <input type="text" id="vehName" required placeholder="Modelo" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+            <input type="text" id="vehPlate" placeholder="Placa" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
             <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">km/L</label>
-                <input type="number" step="0.1" id="vehCons" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">Preço Gasolina (R$/L)</label>
-                <input type="number" step="0.01" id="vehFuelPrice" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              </div>
+              <input type="number" step="0.1" id="vehCons" required placeholder="km/L" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              <input type="number" step="0.01" id="vehFuelPrice" required placeholder="R$/L" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Manutenção (R$/KM)</label>
-              <input type="number" step="0.01" id="vehMaintPerKm" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-            </div>
-            <button type="submit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition-all">Salvar Veículo</button>
+            <input type="number" step="0.01" id="vehMaintPerKm" required placeholder="Manutenção R$/km" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+            <button type="submit" class="w-full py-2.5 bg-amber-600 text-white font-bold rounded-xl">Salvar Veículo</button>
           </form>
         </div>
 
         <div class="lg:col-span-2 space-y-6">
           <div class="glass-card p-6 rounded-2xl border border-amber-500/20">
-            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-4 flex items-center justify-between">
-              <span>Odômetro Diário</span>
-              <i class="fa-solid fa-gauge-high text-amber-400"></i>
-            </h3>
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-4">Odômetro Diário</h3>
             <form onsubmit="saveOdometerLog(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">KM Inicial</label>
-                <input type="number" id="odoStart" oninput="updateOdoCalc()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              </div>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">KM Final</label>
-                <input type="number" id="odoEnd" oninput="updateOdoCalc()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              </div>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">Total Rodado</label>
-                <div class="h-9 rounded-xl bg-slate-900 border border-slate-800 px-3 flex items-center text-amber-400 font-black text-base" id="odoTotalDisplay">0 KM</div>
-              </div>
-              <div class="sm:col-span-3">
-                <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700">Salvar Odômetro</button>
-              </div>
+              <input type="number" id="odoStart" oninput="updateOdoCalc()" placeholder="KM Inicial" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              <input type="number" id="odoEnd" oninput="updateOdoCalc()" placeholder="KM Final" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              <div class="h-9 rounded-xl bg-slate-900 border border-slate-800 px-3 flex items-center text-amber-400 font-black text-base" id="odoTotalDisplay">0 KM</div>
+              <div class="sm:col-span-3"><button type="submit" class="px-4 py-2 bg-slate-800 text-slate-200 text-xs font-bold rounded-xl">Salvar Odômetro</button></div>
             </form>
           </div>
 
           <div class="glass-card p-6 rounded-2xl space-y-4">
-            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider">Outras Despesas (Alimentação, Aluguel, Óleo)</h3>
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider">Outras Despesas</h3>
             <form id="expenseForm" onsubmit="saveExpenseLog(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              <div>
-                <select id="expCategory" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-                  <option value="Alimentação">Alimentação</option>
-                  <option value="Aluguel/Passe Diário">Aluguel/Passe Diário</option>
-                  <option value="Troca de Óleo">Troca de Óleo</option>
-                  <option value="Outros">Outros</option>
-                </select>
-              </div>
-              <div>
-                <input type="text" id="expDesc" placeholder="Descrição" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              </div>
-              <div>
-                <input type="number" step="0.01" id="expValue" placeholder="Valor R$" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              </div>
-              <div>
-                <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs">Adicionar</button>
-              </div>
+              <select id="expCategory" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                <option value="Alimentação">Alimentação</option>
+                <option value="Aluguel/Passe Diário">Aluguel/Passe Diário</option>
+                <option value="Troca de Óleo">Troca de Óleo</option>
+                <option value="Outros">Outros</option>
+              </select>
+              <input type="text" id="expDesc" placeholder="Descrição" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              <input type="number" step="0.01" id="expValue" placeholder="Valor R$" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              <button type="submit" class="w-full py-2 bg-rose-600 text-white font-bold rounded-xl text-xs">Adicionar</button>
             </form>
             <div id="expenseList" class="space-y-2 pt-2"></div>
           </div>
@@ -552,40 +418,31 @@
     <section id="content-history" class="tab-content hidden space-y-6">
       <div class="glass-card p-6 rounded-2xl space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-xl font-bold text-white">Histórico Geral de Corridas</h2>
-            <p class="text-xs text-slate-400">Gerencie todas as corridas da Uber, 99 e Particulares</p>
-          </div>
+          <h2 class="text-xl font-bold text-white">Histórico Geral</h2>
           <div class="flex items-center gap-2">
-            <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg">Exportar CSV</button>
-            <button onclick="clearAllData()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg">Limpar Tudo</button>
+            <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 text-slate-200 rounded-lg">Exportar CSV</button>
+            <button onclick="clearAllData()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 text-rose-400 rounded-lg">Limpar Tudo</button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          <div>
-            <input type="text" id="searchFilter" oninput="renderHistoryTable()" placeholder="Buscar..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
-          </div>
-          <div>
-            <select id="platformFilter" onchange="renderHistoryTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
-              <option value="all">Todas as Plataformas</option>
-              <option value="Uber">Uber</option>
-              <option value="99">99</option>
-              <option value="Particular">Particular</option>
-            </select>
-          </div>
-          <div>
-            <select id="typeFilter" onchange="renderHistoryTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
-              <option value="all">Todos os Tipos</option>
-              <option value="Corrida">Corrida Concluída</option>
-              <option value="Cancelado">Cancelado</option>
-            </select>
-          </div>
+          <input type="text" id="searchFilter" oninput="renderHistoryTable()" placeholder="Buscar..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
+          <select id="platformFilter" onchange="renderHistoryTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
+            <option value="all">Todas as Plataformas</option>
+            <option value="Uber">Uber</option>
+            <option value="99">99</option>
+            <option value="Particular">Particular</option>
+          </select>
+          <select id="typeFilter" onchange="renderHistoryTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
+            <option value="all">Todos os Tipos</option>
+            <option value="Corrida">Concluída</option>
+            <option value="Cancelado">Cancelado</option>
+          </select>
         </div>
 
         <div class="overflow-x-auto rounded-xl border border-slate-800">
           <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold border-b border-slate-800">
+            <thead class="bg-slate-900 text-slate-400 uppercase font-semibold border-b border-slate-800">
               <tr>
                 <th class="p-3">Data / Hora</th>
                 <th class="p-3">Plataforma</th>
@@ -602,23 +459,6 @@
     </section>
 
   </main>
-
-  <!-- API KEY MODAL -->
-  <div id="apiKeyModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-card max-w-md w-full rounded-2xl p-6 border border-slate-800 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="font-bold text-white text-base">Chave API Gemini Vision</h3>
-        <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div>
-        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-      </div>
-      <div class="flex justify-end gap-2">
-        <button onclick="closeApiKeyModal()" class="px-4 py-2 text-xs bg-slate-800 text-slate-300 rounded-xl">Cancelar</button>
-        <button onclick="saveApiKey()" class="px-4 py-2 text-xs bg-indigo-600 text-white rounded-xl">Salvar</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
@@ -646,7 +486,7 @@
     let currentUser = null;
 
     let appState = {
-      apiKey: localStorage.getItem('gemini_api_key') || '',
+      apiKey: "AQ.Ab8RN6JYZ9UtQ8JihBG7mrzbj2dN1gAFenzCPQw_apFKIytSFw", // Chave embutida e invisível
       selectedScanPlatform: 'Uber',
       vehicle: JSON.parse(localStorage.getItem('driver_vehicle')) || {
         name: 'Mottu Sport TVS HLX 150',
@@ -739,19 +579,16 @@
     }
 
     window.onload = function() {
-      // Definir data padrão no formulário manual como o dia de hoje
       const todayDateStr = new Date().toISOString().split('T')[0];
       const manualDateEl = document.getElementById('manualDate');
       if (manualDateEl) manualDateEl.value = todayDateStr;
 
-      updateApiKeyStatus();
       loadVehicleFormValues();
       renderDashboard();
       renderParticularList();
       renderExpensesList();
       renderHistoryTable();
 
-      const dropZone = document.getElementById('dropZone');
       const fileInput = document.getElementById('fileInput');
       if (fileInput) {
         fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files));
@@ -779,23 +616,6 @@
       if (tabId === 'dashboard') renderDashboard();
     }
 
-    function openApiKeyModal() {
-      document.getElementById('geminiApiKeyInput').value = appState.apiKey;
-      document.getElementById('apiKeyModal').classList.remove('hidden');
-    }
-    function closeApiKeyModal() { document.getElementById('apiKeyModal').classList.add('hidden'); }
-    function saveApiKey() {
-      appState.apiKey = document.getElementById('geminiApiKeyInput').value.trim();
-      localStorage.setItem('gemini_api_key', appState.apiKey);
-      updateApiKeyStatus();
-      closeApiKeyModal();
-      showToast('Chave API salva!', 'success');
-    }
-    function updateApiKeyStatus() {
-      const dot = document.getElementById('apiKeyStatusDot');
-      dot.className = appState.apiKey ? "w-2 h-2 rounded-full bg-emerald-400 animate-pulse" : "w-2 h-2 rounded-full bg-rose-500";
-    }
-
     function showToast(message, type = 'info') {
       const toast = document.getElementById('toast');
       const content = document.getElementById('toastContent');
@@ -814,7 +634,6 @@
       const time = document.getElementById('manualTime').value;
       const value = parseFloat(document.getElementById('manualValue').value) || 0;
       const km = parseFloat(document.getElementById('manualKm').value) || 0;
-      const obs = document.getElementById('manualObs').value;
 
       const signatureKey = `${platform}_${date}_${time}_${value.toFixed(2)}`;
       if (appState.rides.some(r => r.signatureKey === signatureKey)) {
@@ -832,15 +651,12 @@
         type: 'Corrida',
         value,
         distanceKm: km,
-        durationMin: 0,
-        obs
+        durationMin: 0
       };
 
       appState.rides.unshift(newRide);
       saveUserDataToCloud();
       document.getElementById('particularForm').reset();
-      
-      // Restaurar data para hoje após resetar
       document.getElementById('manualDate').value = new Date().toISOString().split('T')[0];
 
       showToast(`Corrida da ${platform} salva com sucesso!`, 'success');
@@ -851,7 +667,7 @@
 
     function renderParticularList() {
       const container = document.getElementById('particularRidesList');
-      const manualRides = appState.rides.filter(r => r.platform === 'Particular' || r.platform === '99' || r.platform === 'Uber').slice(0, 10);
+      const manualRides = appState.rides.slice(0, 10);
       if (!manualRides.length) {
         container.innerHTML = `<p class="text-xs text-slate-500 py-4">Nenhuma corrida cadastrada recentemente.</p>`;
         return;
@@ -866,7 +682,7 @@
             <p class="text-[10px] text-slate-400 mt-1">${r.date || ''} às ${r.time} • ${r.distanceKm} km</p>
           </div>
           <div class="text-right">
-            <span class="font-black text-emerald-400 text-sm">+ R$ ${r.value.toFixed(2)}</span>
+            <span class="font-black text-emerald-400 text-sm">+ R$ ${parseFloat(r.value).toFixed(2)}</span>
           </div>
         </div>
       `).join('');
@@ -878,14 +694,9 @@
       document.getElementById('calcResult').innerText = `R$ ${(km * target).toFixed(2)}`;
     }
 
-    // Scanner Gemini AI com modelo corrigido
+    // Scanner Gemini AI
     async function handleFileUpload(files) {
       if (!files || !files.length) return;
-      if (!appState.apiKey) {
-        showToast('Configure sua chave de API Gemini primeiro!', 'error');
-        openApiKeyModal();
-        return;
-      }
 
       const loader = document.getElementById('uploadLoader');
       const summary = document.getElementById('uploadSummary');
@@ -903,9 +714,7 @@
           const base64Data = await fileToBase64(file);
           const extractedRides = await processImageWithGemini(base64Data, file.type, targetPlatform);
           extractedRides.forEach(ride => {
-            if (!ride.date || ride.date === '2026-10-22') {
-              ride.date = todayStr; // Atribuir data atual se o OCR não achar ou se vier o demo
-            }
+            if (!ride.date) ride.date = todayStr;
             const sigKey = `${ride.platform}_${ride.date}_${ride.time}`;
             if (!appState.rides.some(r => r.signatureKey === sigKey)) {
               ride.signatureKey = sigKey;
@@ -917,7 +726,7 @@
             }
           });
         } catch (error) {
-          showToast(`Erro ao analisar print. Use o lançamento manual se persistir.`, 'error');
+          showToast(`Erro ao analisar print. Use o lançamento manual.`, 'error');
         }
       }
 
@@ -970,15 +779,8 @@
       event.target.classList.remove('bg-slate-800', 'text-slate-300');
       event.target.classList.add('bg-indigo-600', 'text-white');
       
-      const labels = {
-        today: 'Hoje',
-        yesterday: 'Ontem',
-        week: 'Esta Semana',
-        month: 'Este Mês',
-        all: 'Todo o Histórico'
-      };
+      const labels = { today: 'Hoje', yesterday: 'Ontem', week: 'Esta Semana', month: 'Este Mês', all: 'Todo o Histórico' };
       document.getElementById('currentPeriodLabel').innerText = labels[period];
-
       renderDashboard();
     }
 
@@ -988,12 +790,11 @@
 
       return appState.rides.filter(r => {
         if (period === 'all') return true;
-        if (period === 'today') return r.date === todayStr || r.date === '2026-10-22' || !r.date;
+        if (period === 'today') return r.date === todayStr || !r.date;
         if (period === 'yesterday') {
           const d = new Date();
           d.setDate(d.getDate() - 1);
-          const yestStr = d.toISOString().split('T')[0];
-          return r.date === yestStr || r.date === '2026-10-21';
+          return r.date === d.toISOString().split('T')[0];
         }
         return true;
       });
@@ -1002,14 +803,13 @@
     function renderDashboard() {
       const rides = getFilteredRides();
       const v = appState.vehicle;
-      let bruto = 0, kmApp = 0, minTotal = 0, uber = 0, nine = 0, part = 0, completed = 0;
+      let bruto = 0, kmApp = 0, minTotal = 0, uber = 0, nine = 0, part = 0;
 
       rides.forEach(r => {
         const val = parseFloat(r.value) || 0;
         bruto += val;
         kmApp += parseFloat(r.distanceKm) || 0;
         minTotal += parseFloat(r.durationMin) || 0;
-        if (r.type !== 'Cancelado') completed++;
         if (r.platform === 'Uber') uber += val;
         else if (r.platform === '99') nine += val;
         else if (r.platform === 'Particular') part += val;
@@ -1202,20 +1002,6 @@
       link.href = URL.createObjectURL(blob);
       link.download = 'corridas.csv';
       link.click();
-    }
-
-    function loadDemoData() {
-      const todayStr = new Date().toISOString().split('T')[0];
-      appState.rides = [
-        { id: '1', platform: 'Uber', date: todayStr, time: '22:02', type: 'Corrida', value: 13.56, distanceKm: 2.1 },
-        { id: '2', platform: '99', date: todayStr, time: '21:00', type: 'Corrida', value: 15.00, distanceKm: 4.0 },
-        { id: '3', platform: 'Particular', date: todayStr, time: '15:30', client: 'Entrega Direct', type: 'Corrida', value: 35.00, distanceKm: 12.0 }
-      ];
-      saveUserDataToCloud();
-      renderDashboard();
-      renderHistoryTable();
-      renderParticularList();
-      showToast('Dados de exemplo carregados para hoje!', 'success');
     }
   </script>
 </body>
