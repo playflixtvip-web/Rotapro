@@ -118,10 +118,9 @@
         </div>
       </div>
 
-      <!-- Header Quick Actions (Apenas Logout e Status Limpo) -->
       <div class="flex items-center gap-2 sm:gap-3">
         <div class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-xs font-semibold">
-          <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> IA Ativa
+          <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> IA Vision Ativa
         </div>
 
         <button onclick="logout()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg transition-all flex items-center gap-1" title="Sair da Conta">
@@ -263,39 +262,54 @@
       </div>
     </section>
 
-    <!-- TAB 2: SCANNER DE PRINTS -->
+    <!-- TAB 2: SCANNER DE PRINTS (GEMINI AI VISION) -->
     <section id="content-upload" class="tab-content hidden space-y-6">
-      <div class="glass-card p-6 rounded-2xl border border-indigo-500/20 space-y-6">
+      <div class="glass-card p-6 rounded-2xl border border-indigo-500/25 space-y-6">
         <div class="max-w-3xl">
-          <h2 class="text-2xl font-bold text-white mb-2">Scanner Inteligente Vision Gemini AI</h2>
-          <p class="text-slate-400 text-sm leading-relaxed">Selecione o aplicativo e envie o print para leitura automática por IA.</p>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold mb-3">
+            <i class="fa-solid fa-brain"></i> Scanner Inteligente Vision Gemini AI
+          </div>
+          <h2 class="text-2xl font-bold text-white mb-2">Upload e Leitura Automática de Prints</h2>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Selecione o aplicativo e envie seu print. O modelo Gemini lerá automaticamente os horários, valores e status aplicando a <b>trava anti-duplicação</b>.
+          </p>
         </div>
 
         <div class="space-y-2">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">1. Selecione o Aplicativo:</label>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">1. Selecione o Aplicativo do Print:</label>
           <div class="flex gap-3">
-            <button type="button" onclick="setScanPlatform('Uber')" id="scanBtnUber" class="px-5 py-3 rounded-xl font-bold text-sm border bg-black text-white border-indigo-500 shadow-lg">Uber</button>
-            <button type="button" onclick="setScanPlatform('99')" id="scanBtn99" class="px-5 py-3 rounded-xl font-bold text-sm border bg-slate-900 text-slate-400 border-slate-800">99 (Junta Recompensas)</button>
+            <button type="button" onclick="setScanPlatform('Uber')" id="scanBtnUber" class="px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-black text-white border-indigo-500 shadow-lg">
+              <i class="fa-solid fa-car"></i> Uber
+            </button>
+            <button type="button" onclick="setScanPlatform('99')" id="scanBtn99" class="px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-slate-900 text-slate-400 border-slate-800">
+              <i class="fa-solid fa-motorcycle"></i> 99 (Pop / Moto)
+            </button>
           </div>
         </div>
 
         <div class="space-y-2">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">2. Envie o Print:</label>
-          <div class="border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-900/50 rounded-2xl p-8 text-center cursor-pointer relative" id="dropZone">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">2. Envie o Print ou Extrato:</label>
+          <div class="border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-900/50 hover:bg-slate-900/80 rounded-2xl p-8 text-center cursor-pointer relative group transition-all" id="dropZone">
             <input type="file" id="fileInput" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
             <div class="space-y-3 pointer-events-none">
-              <i class="fa-solid fa-cloud-arrow-up text-3xl text-indigo-400"></i>
-              <p class="text-sm font-semibold text-slate-200">Arraste seus prints ou clique para selecionar</p>
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <p class="text-sm font-semibold text-slate-200">Arraste seus prints aqui ou <span class="text-indigo-400 underline">clique para selecionar</span></p>
+              <p class="text-xs text-slate-500">Suporta múltiplos arquivos PNG, JPG, WEBP</p>
             </div>
           </div>
         </div>
 
-        <div id="uploadLoader" class="hidden bg-indigo-950/40 border border-indigo-800 p-5 rounded-2xl flex items-center gap-4">
+        <div id="uploadLoader" class="hidden bg-indigo-950/40 border border-indigo-800/50 p-5 rounded-2xl flex items-center gap-4">
           <div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-sm text-indigo-200" id="loaderTitle">Analisando imagem com Gemini AI...</span>
+          <div>
+            <h4 class="font-semibold text-indigo-200 text-sm" id="loaderTitle">Analisando imagem com Gemini AI...</h4>
+            <p class="text-xs text-indigo-400">Extraindo horários, valores e verificando duplicações...</p>
+          </div>
         </div>
 
-        <div id="uploadSummary" class="hidden p-4 rounded-2xl bg-slate-900 border border-slate-800"></div>
+        <div id="uploadSummary" class="hidden p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2"></div>
       </div>
     </section>
 
@@ -309,7 +323,7 @@
           <form id="particularForm" onsubmit="saveManualRide(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-semibold text-slate-400 mb-1">Plataforma</label>
-              <select id="manualPlatform" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              <select id="manualPlatform" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
                 <option value="Uber">Uber</option>
                 <option value="99">99 Pop</option>
                 <option value="Particular">Particular / Direct</option>
@@ -317,45 +331,56 @@
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Nome do Cliente (Opcional p/ App)</label>
-              <input type="text" id="manualClient" placeholder="Ex: João Silva" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Nome do Cliente (Opcional)</label>
+              <input type="text" id="manualClient" placeholder="Ex: João Silva ou Entrega Direct" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Data</label>
-                <input type="date" id="manualDate" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                <input type="date" id="manualDate" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Horário</label>
-                <input type="time" id="manualTime" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                <input type="time" id="manualTime" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Valor (R$)</label>
-                <input type="number" step="0.01" id="manualValue" required placeholder="25.00" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                <input type="number" step="0.01" id="manualValue" required placeholder="35.00" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Distância (KM)</label>
-                <input type="number" step="0.1" id="manualKm" placeholder="5.0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                <input type="number" step="0.1" id="manualKm" placeholder="12.5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
               </div>
             </div>
 
-            <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition-all">
-              Salvar Corrida Manual
+            <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Corrida
             </button>
           </form>
         </div>
 
         <div class="lg:col-span-2 space-y-6">
           <div class="glass-card p-6 rounded-2xl border border-emerald-500/20">
-            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-3">Calculadora de Preço por KM</h3>
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-emerald-400"></i> Calculadora de Preço de Corrida
+            </h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div><input type="number" id="calcKm" oninput="calculateEstimateFare()" placeholder="Ex: 15" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"></div>
-              <div><input type="number" step="0.1" id="calcTargetKm" oninput="calculateEstimateFare()" value="2.50" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"></div>
-              <div class="h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3 flex items-center text-emerald-400 font-bold text-base" id="calcResult">R$ 0,00</div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">KM Estimado</label>
+                <input type="number" id="calcKm" oninput="calculateEstimateFare()" placeholder="Ex: 15" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Sua Meta (R$/KM)</label>
+                <input type="number" step="0.1" id="calcTargetKm" oninput="calculateEstimateFare()" value="2.50" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Sugestão de Cobrança</label>
+                <div class="h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3 flex items-center text-emerald-400 font-bold text-base" id="calcResult">R$ 0,00</div>
+              </div>
             </div>
           </div>
 
@@ -371,42 +396,81 @@
     <section id="content-vehicle" class="tab-content hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-1 glass-card p-6 rounded-2xl space-y-4">
-          <h3 class="font-bold text-lg text-white">Cadastro do Veículo</h3>
+          <h3 class="font-bold text-lg text-white flex items-center gap-2">
+            <i class="fa-solid fa-motorcycle text-amber-400"></i> Cadastro do Veículo
+          </h3>
           <form id="vehicleForm" onsubmit="saveVehicleData(event)" class="space-y-4">
-            <input type="text" id="vehName" required placeholder="Modelo" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-            <input type="text" id="vehPlate" placeholder="Placa" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-            <div class="grid grid-cols-2 gap-3">
-              <input type="number" step="0.1" id="vehCons" required placeholder="km/L" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              <input type="number" step="0.01" id="vehFuelPrice" required placeholder="R$/L" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Modelo / Nome</label>
+              <input type="text" id="vehName" required placeholder="Ex: Mottu Sport TVS HLX 150" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
             </div>
-            <input type="number" step="0.01" id="vehMaintPerKm" required placeholder="Manutenção R$/km" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-            <button type="submit" class="w-full py-2.5 bg-amber-600 text-white font-bold rounded-xl">Salvar Veículo</button>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Placa</label>
+              <input type="text" id="vehPlate" placeholder="RIO-2026" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Consumo (km/L)</label>
+                <input type="number" step="0.1" id="vehCons" required placeholder="38.0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Preço Gasolina (R$/L)</label>
+                <input type="number" step="0.01" id="vehFuelPrice" required placeholder="5.89" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Manutenção (R$/KM)</label>
+              <input type="number" step="0.01" id="vehMaintPerKm" required placeholder="0.08" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+            </div>
+            <button type="submit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow-lg transition-all">Salvar Veículo</button>
           </form>
         </div>
 
         <div class="lg:col-span-2 space-y-6">
           <div class="glass-card p-6 rounded-2xl border border-amber-500/20">
-            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-4">Odômetro Diário</h3>
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-4 flex items-center justify-between">
+              <span>Odômetro Diário (KM do Dia)</span>
+              <i class="fa-solid fa-gauge-high text-amber-400"></i>
+            </h3>
             <form onsubmit="saveOdometerLog(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <input type="number" id="odoStart" oninput="updateOdoCalc()" placeholder="KM Inicial" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              <input type="number" id="odoEnd" oninput="updateOdoCalc()" placeholder="KM Final" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              <div class="h-9 rounded-xl bg-slate-900 border border-slate-800 px-3 flex items-center text-amber-400 font-black text-base" id="odoTotalDisplay">0 KM</div>
-              <div class="sm:col-span-3"><button type="submit" class="px-4 py-2 bg-slate-800 text-slate-200 text-xs font-bold rounded-xl">Salvar Odômetro</button></div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">KM Inicial</label>
+                <input type="number" id="odoStart" oninput="updateOdoCalc()" placeholder="Ex: 14925" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">KM Final</label>
+                <input type="number" id="odoEnd" oninput="updateOdoCalc()" placeholder="Ex: 15130" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Total Rodado</label>
+                <div class="h-9 rounded-xl bg-slate-900 border border-slate-800 px-3 flex items-center text-amber-400 font-black text-base" id="odoTotalDisplay">0 KM</div>
+              </div>
+              <div class="sm:col-span-3">
+                <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700">Salvar Odômetro</button>
+              </div>
             </form>
           </div>
 
           <div class="glass-card p-6 rounded-2xl space-y-4">
-            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider">Outras Despesas</h3>
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider">Outras Despesas (Alimentação, Óleo, Diária)</h3>
             <form id="expenseForm" onsubmit="saveExpenseLog(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              <select id="expCategory" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-                <option value="Alimentação">Alimentação</option>
-                <option value="Aluguel/Passe Diário">Aluguel/Passe Diário</option>
-                <option value="Troca de Óleo">Troca de Óleo</option>
-                <option value="Outros">Outros</option>
-              </select>
-              <input type="text" id="expDesc" placeholder="Descrição" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              <input type="number" step="0.01" id="expValue" placeholder="Valor R$" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
-              <button type="submit" class="w-full py-2 bg-rose-600 text-white font-bold rounded-xl text-xs">Adicionar</button>
+              <div>
+                <select id="expCategory" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                  <option value="Alimentação">Alimentação</option>
+                  <option value="Aluguel/Passe Diário">Aluguel/Passe Diário</option>
+                  <option value="Troca de Óleo">Troca de Óleo</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+              <div>
+                <input type="text" id="expDesc" placeholder="Descrição" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <input type="number" step="0.01" id="expValue" placeholder="Valor R$" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs">Adicionar</button>
+              </div>
             </form>
             <div id="expenseList" class="space-y-2 pt-2"></div>
           </div>
@@ -420,13 +484,13 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h2 class="text-xl font-bold text-white">Histórico Geral</h2>
           <div class="flex items-center gap-2">
-            <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 text-slate-200 rounded-lg">Exportar CSV</button>
-            <button onclick="clearAllData()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 text-rose-400 rounded-lg">Limpar Tudo</button>
+            <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg">Exportar CSV</button>
+            <button onclick="clearAllData()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg">Limpar Tudo</button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          <input type="text" id="searchFilter" oninput="renderHistoryTable()" placeholder="Buscar..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
+          <input type="text" id="searchFilter" oninput="renderHistoryTable()" placeholder="Buscar por horário, plataforma..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
           <select id="platformFilter" onchange="renderHistoryTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
             <option value="all">Todas as Plataformas</option>
             <option value="Uber">Uber</option>
@@ -465,7 +529,7 @@
     <div id="toastContent" class="glass-card px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-3 text-sm font-semibold"></div>
   </div>
 
-  <!-- JAVASCRIPT -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyD4m9ed7ZJeuv9BfphJy7AxLWvNvCD1oP0",
@@ -486,7 +550,7 @@
     let currentUser = null;
 
     let appState = {
-      apiKey: "AQ.Ab8RN6JYZ9UtQ8JihBG7mrzbj2dN1gAFenzCPQw_apFKIytSFw", // Chave embutida e invisível
+      apiKey: "AQ.Ab8RN6JYZ9UtQ8JihBG7mrzbj2dN1gAFenzCPQw_apFKIytSFw", // Chave embutida e protegida
       selectedScanPlatform: 'Uber',
       vehicle: JSON.parse(localStorage.getItem('driver_vehicle')) || {
         name: 'Mottu Sport TVS HLX 150',
@@ -590,8 +654,18 @@
       renderHistoryTable();
 
       const fileInput = document.getElementById('fileInput');
+      const dropZone = document.getElementById('dropZone');
       if (fileInput) {
         fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files));
+      }
+      if (dropZone) {
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-indigo-500'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-indigo-500'));
+        dropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('border-indigo-500');
+          if (e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files);
+        });
       }
     };
 
@@ -619,13 +693,17 @@
     function showToast(message, type = 'info') {
       const toast = document.getElementById('toast');
       const content = document.getElementById('toastContent');
-      content.className = `glass-card px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-3 text-sm font-semibold border-indigo-500/30 text-indigo-200 bg-indigo-950/80`;
+      let borderClass = 'border-indigo-500/30 text-indigo-200 bg-indigo-950/80';
+      if (type === 'success') borderClass = 'border-emerald-500/30 text-emerald-200 bg-emerald-950/80';
+      if (type === 'warning') borderClass = 'border-amber-500/30 text-amber-200 bg-amber-950/80';
+      if (type === 'error') borderClass = 'border-rose-500/30 text-rose-200 bg-rose-950/80';
+
+      content.className = `glass-card px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-3 text-sm font-semibold ${borderClass}`;
       content.innerHTML = `<span>${message}</span>`;
       toast.classList.remove('translate-y-20', 'opacity-0');
       setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 4000);
     }
 
-    // Lançamento Manual (Uber, 99 e Particular)
     function saveManualRide(e) {
       e.preventDefault();
       const platform = document.getElementById('manualPlatform').value;
@@ -659,7 +737,7 @@
       document.getElementById('particularForm').reset();
       document.getElementById('manualDate').value = new Date().toISOString().split('T')[0];
 
-      showToast(`Corrida da ${platform} salva com sucesso!`, 'success');
+      showToast(`Corrida salva com sucesso!`, 'success');
       renderParticularList();
       renderHistoryTable();
       renderDashboard();
@@ -694,7 +772,7 @@
       document.getElementById('calcResult').innerText = `R$ ${(km * target).toFixed(2)}`;
     }
 
-    // Scanner Gemini AI
+    // --- GEMINI VISION OCR API INTEGRATION (ROBUST) ---
     async function handleFileUpload(files) {
       if (!files || !files.length) return;
 
@@ -706,17 +784,24 @@
       let importedCount = 0;
       let ignoredCount = 0;
       const targetPlatform = appState.selectedScanPlatform || 'Uber';
-      const todayStr = new Date().toISOString().split('T')[0];
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        document.getElementById('loaderTitle').innerText = `Analisando print (${i+1}/${files.length}): ${file.name}`;
+        
         try {
           const base64Data = await fileToBase64(file);
           const extractedRides = await processImageWithGemini(base64Data, file.type, targetPlatform);
+          
           extractedRides.forEach(ride => {
+            const todayStr = new Date().toISOString().split('T')[0];
             if (!ride.date) ride.date = todayStr;
-            const sigKey = `${ride.platform}_${ride.date}_${ride.time}`;
-            if (!appState.rides.some(r => r.signatureKey === sigKey)) {
+            
+            // Trava rigorosa anti-duplicação por assinatura única
+            const sigKey = `${ride.platform}_${ride.date}_${ride.time}_${parseFloat(ride.value).toFixed(2)}`;
+            const isDuplicate = appState.rides.some(r => r.signatureKey === sigKey);
+
+            if (!isDuplicate) {
               ride.signatureKey = sigKey;
               ride.id = 'AI-' + Math.random().toString(36).substr(2, 9);
               appState.rides.unshift(ride);
@@ -725,16 +810,33 @@
               ignoredCount++;
             }
           });
+
         } catch (error) {
-          showToast(`Erro ao analisar print. Use o lançamento manual.`, 'error');
+          console.error("Erro OCR Gemini:", error);
+          showToast(`Erro ao ler o print. Use o lançamento manual.`, 'error');
         }
       }
 
       loader.classList.add('hidden');
       saveUserDataToCloud();
+
       summary.classList.remove('hidden');
-      summary.innerHTML = `<p class="text-xs text-emerald-400 font-bold">Importação concluída: ${importedCount} adicionadas, ${ignoredCount} duplicadas ignoradas.</p>`;
-      showToast(`${importedCount} corridas importadas!`, 'success');
+      summary.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <i class="fa-solid fa-check-double text-xl"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-white text-sm">Scanner Concluído!</h4>
+            <p class="text-xs text-slate-400 mt-0.5">
+              <b class="text-emerald-400">${importedCount}</b> novas corridas importadas.
+              <b class="text-amber-400">${ignoredCount}</b> repetidas ignoradas.
+            </p>
+          </div>
+        </div>
+      `;
+
+      showToast(`Processamento concluído! ${importedCount} corridas importadas.`, 'success');
       renderHistoryTable();
       renderDashboard();
     }
@@ -743,7 +845,10 @@
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result.replace(/^data:(.*,)?/, ''));
+        reader.onload = () => {
+          let encoded = reader.result.replace(/^data:(.*,)?/, '');
+          resolve(encoded);
+        };
         reader.onerror = error => reject(error);
       });
     }
@@ -751,25 +856,79 @@
     async function processImageWithGemini(base64ImageData, mimeType, platform) {
       const apiKey = appState.apiKey;
       const todayStr = new Date().toISOString().split('T')[0];
-      const systemPrompt = `Extraia todas as corridas do print do aplicativo ${platform} em JSON puro: [{"platform": "${platform}", "date": "${todayStr}", "time": "18:31", "type": "Corrida", "value": 14.50, "distanceKm": 5.2, "durationMin": 12}]`;
+      
+      const systemPrompt = `Você é um leitor de OCR especializado em extratos de aplicativos de transporte (${platform}).
+Analise o print enviado e extraia TODAS as corridas, viagens, recompensas ou taxas listadas.
+Retorne um JSON puro estrito contendo um array de objetos com o seguinte formato:
+[
+  {
+    "platform": "${platform}",
+    "date": "${todayStr}",
+    "time": "HH:MM",
+    "type": "Corrida", "Recompensa" ou "Cancelado",
+    "value": número ex: 14.50,
+    "distanceKm": número ex: 5.2,
+    "durationMin": número ex: 12
+  }
+]
+Retorne APENAS o JSON válido sem nenhum texto adicional ou formatação markdown.`;
+
+      const userPrompt = `Analise este print de extrato da ${platform} e extraia todas as viagens com precisão.`;
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: "Analise este print" }, { inlineData: { mimeType: mimeType || "image/png", data: base64ImageData } }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          generationConfig: { responseMimeType: "application/json" }
-        })
-      });
+      const payload = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: userPrompt },
+              {
+                inlineData: {
+                  mimeType: mimeType || "image/png",
+                  data: base64ImageData
+                }
+              }
+            ]
+          }
+        ],
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        generationConfig: {
+          responseMimeType: "application/json"
+        }
+      };
 
-      if (!response.ok) throw new Error("Erro na API");
+      let response;
+      let retries = 0;
+      while (retries < 3) {
+        try {
+          response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (response.ok) break;
+        } catch (e) {}
+        retries++;
+        await new Promise(r => setTimeout(r, 1000 * retries));
+      }
+
+      if (!response || !response.ok) throw new Error("Falha na API Gemini.");
+
       const result = await response.json();
       const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-      return rawText ? JSON.parse(rawText) : [];
+      if (!rawText) return [];
+
+      try {
+        const jsonRides = JSON.parse(rawText);
+        return Array.isArray(jsonRides) ? jsonRides : [];
+      } catch (err) {
+        return [];
+      }
     }
 
+    // --- DASHBOARD & FILTERS ---
     function setFilterPeriod(period) {
       appState.filterPeriod = period;
       document.querySelectorAll('.period-btn').forEach(btn => {
@@ -1000,7 +1159,7 @@
       const blob = new Blob([csv], { type: 'text/csv' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'corridas.csv';
+      link.download = 'corridas_rotapro.csv';
       link.click();
     }
   </script>
