@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RotaPro AI - Gestão Financeira Inteligente</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js for Graphics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            uber: '#000000',
+            nineNine: '#ff8c00',
+            particular: '#10b981'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .active-tab {
+      background-color: #312e81;
+      color: #a5b4fc;
+      border-bottom: 2px solid #818cf8;
+    }
+  </style>
+</head>
+<body class="h-full bg-slate-950 font-sans text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- AUTH MODAL / LOGIN OVERLAY -->
+  <div id="authOverlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-md w-full rounded-3xl p-8 border border-indigo-500/20 shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <div class="flex items-center justify-center gap-3">
+          <svg class="w-12 h-12 text-indigo-500 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 70C20 70 35 30 50 30C65 30 80 70 80 70" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="50" cy="30" r="8" fill="#10B981"/>
+            <path d="M30 80L50 50L70 80" stroke="#F59E0B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="50" cy="50" r="5" fill="#6366F1"/>
+          </svg>
+          <span class="text-3xl font-black tracking-wider bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">RotaPro <span class="text-indigo-500">AI</span></span>
+        </div>
+        <p class="text-xs text-slate-400 font-medium">Gestão Financeira & Nuvem Inteligente</p>
+      </div>
+
+      <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
+        <div id="nameGroup" class="space-y-1" style="display: none;">
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Como prefere ser chamado?</label>
+          <input type="text" id="authName" placeholder="Ex: Rhuan" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 focus:outline-none">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">E-mail</label>
+          <input type="email" id="authEmail" required placeholder="seu@email.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 focus:outline-none">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Senha</label>
+          <input type="password" id="authPassword" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 focus:outline-none">
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all text-sm flex items-center justify-center gap-2">
+          <i class="fa-solid fa-right-to-bracket"></i> Entrar na Nuvem
+        </button>
+      </form>
+
+      <div class="text-center pt-2">
+        <button type="button" onclick="toggleAuthMode()" id="authToggleBtn" class="text-xs text-indigo-400 hover:underline font-semibold">
+          Não tem uma conta? Cadastre-se gratuitamente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+          <i class="fa-solid font-bold fa-gauge-high text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">RotaPro AI</h1>
+          <p class="text-xs text-slate-400 font-medium" id="welcomeUserDisplay">Gestão Financeira Inteligente</p>
+        </div>
+      </div>
+
+      <!-- Header Quick Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button onclick="loadDemoData()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span class="hidden sm:inline">Exemplo (22/10)</span>
+          <span class="sm:hidden">Demo</span>
+        </button>
+
+        <button onclick="openApiKeyModal()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-key text-indigo-400"></i>
+          <span class="hidden sm:inline">API Gemini</span>
+          <span id="apiKeyStatusDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
+        </button>
+
+        <button onclick="logout()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg transition-all flex items-center gap-1" title="Sair da Conta">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-slate-900/80 border-t border-slate-800/80 overflow-x-auto no-scrollbar">
+      <div class="max-w-7xl mx-auto px-4 flex gap-1 sm:gap-2">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 hover:text-white flex items-center gap-2 border-b-2 border-transparent transition-all whitespace-nowrap active-tab">
+          <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </button>
+        <button onclick="switchTab('upload')" id="tab-upload" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 hover:text-white flex items-center gap-2 border-b-2 border-transparent transition-all whitespace-nowrap">
+          <i class="fa-solid fa-expand text-indigo-400"></i> Scanner de Prints
+        </button>
+        <button onclick="switchTab('particular')" id="tab-particular" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 hover:text-white flex items-center gap-2 border-b-2 border-transparent transition-all whitespace-nowrap">
+          <i class="fa-solid fa-pen-to-square text-emerald-400"></i> Lançamento Manual
+        </button>
+        <button onclick="switchTab('vehicle')" id="tab-vehicle" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 hover:text-white flex items-center gap-2 border-b-2 border-transparent transition-all whitespace-nowrap">
+          <i class="fa-solid fa-motorcycle text-amber-400"></i> Veículo & Custos
+        </button>
+        <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 hover:text-white flex items-center gap-2 border-b-2 border-transparent transition-all whitespace-nowrap">
+          <i class="fa-solid fa-list-check"></i> Histórico & Filtros
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- TAB 1: DASHBOARD -->
+    <section id="content-dashboard" class="tab-content space-y-6">
+      <!-- Period Selector Banner -->
+      <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400">
+            <i class="fa-solid fa-calendar-days text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Período Selecionado</h2>
+            <div class="text-lg font-bold text-white flex items-center gap-2" id="currentPeriodLabel">Hoje</div>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="setFilterPeriod('today')" class="period-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white">Hoje</button>
+          <button onclick="setFilterPeriod('yesterday')" class="period-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Ontem</button>
+          <button onclick="setFilterPeriod('week')" class="period-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Esta Semana</button>
+          <button onclick="setFilterPeriod('month')" class="period-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Este Mês</button>
+          <button onclick="setFilterPeriod('all')" class="period-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Tudo</button>
+        </div>
+      </div>
+
+      <!-- Vehicle Overview Widget -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="vehicleQuickBar"></div>
+
+      <!-- Financial Metrics Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Faturamento Bruto -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all"></div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Faturamento Bruto</span>
+            <span class="p-2 bg-indigo-500/10 rounded-lg text-indigo-400"><i class="fa-solid fa-wallet"></i></span>
+          </div>
+          <div class="text-2xl font-black text-white" id="dashBruto">R$ 0,00</div>
+          <p class="text-xs text-slate-400 mt-2 flex items-center gap-1" id="dashTotalCorridasCount">
+            <i class="fa-solid fa-route"></i> 0 corridas finalizadas
+          </p>
+        </div>
+
+        <!-- Custos Totais -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition-all"></div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Custos Estimados</span>
+            <span class="p-2 bg-rose-500/10 rounded-lg text-rose-400"><i class="fa-solid fa-gas-pump"></i></span>
+          </div>
+          <div class="text-2xl font-black text-rose-400" id="dashCustos">R$ 0,00</div>
+          <p class="text-xs text-slate-400 mt-2" id="dashCustosBreakdown">Combustível + Manutenção + Avulsos</p>
+        </div>
+
+        <!-- Lucro Líquido Real -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group border-emerald-500/30">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Lucro Líquido Real</span>
+            <span class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400"><i class="fa-solid fa-money-bill-trend-up"></i></span>
+          </div>
+          <div class="text-2xl font-black text-emerald-400" id="dashLucro">R$ 0,00</div>
+          <p class="text-xs text-emerald-500/80 mt-2 font-medium" id="dashMargemLucro">Margem: 0% do bruto</p>
+        </div>
+
+        <!-- Rendimento por KM -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Ganhos por KM Rodado</span>
+            <span class="p-2 bg-amber-500/10 rounded-lg text-amber-400"><i class="fa-solid fa-gauge"></i></span>
+          </div>
+          <div class="text-2xl font-black text-amber-300" id="dashRendimentoKm">R$ 0,00 <span class="text-xs font-normal text-slate-400">/ km</span></div>
+          <p class="text-xs text-slate-400 mt-2" id="dashLucroKm">Lucro Líq: R$ 0,00/km</p>
+        </div>
+      </div>
+
+      <!-- Platform Earnings Breakdown -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="glass-card p-5 rounded-2xl space-y-4">
+          <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider flex items-center justify-between">
+            <span>Faturamento por Plataforma</span>
+            <i class="fa-solid fa-layer-group text-slate-500"></i>
+          </h3>
+          <div class="space-y-3">
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs border border-slate-700">UBER</div>
+                <div>
+                  <p class="text-sm font-semibold text-white">Uber App</p>
+                  <p class="text-xs text-slate-400" id="uberSubtext">0 corridas</p>
+                </div>
+              </div>
+              <span class="font-bold text-slate-200" id="uberTotal">R$ 0,00</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-500 text-black flex items-center justify-center font-black text-xs">99</div>
+                <div>
+                  <p class="text-sm font-semibold text-white">99 Pop / Moto</p>
+                  <p class="text-xs text-slate-400" id="nineNineSubtext">0 corridas</p>
+                </div>
+              </div>
+              <span class="font-bold text-slate-200" id="nineNineTotal">R$ 0,00</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-handshake"></i></div>
+                <div>
+                  <p class="text-sm font-semibold text-white">Particulares</p>
+                  <p class="text-xs text-slate-400" id="partSubtext">0 corridas</p>
+                </div>
+              </div>
+              <span class="font-bold text-slate-200" id="partTotal">R$ 0,00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center">
+          <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-2 self-start">Divisão de Faturamento</h3>
+          <div class="w-full max-w-[240px] h-[200px] relative flex items-center justify-center">
+            <canvas id="chartPlatforms"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl space-y-4">
+          <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider flex items-center justify-between">
+            <span>Produtividade & Desempenho</span>
+            <i class="fa-solid fa-chart-line text-indigo-400"></i>
+          </h3>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-slate-400">Taxa de Conclusão</span>
+                <span class="text-emerald-400" id="completionRate">100%</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                <div id="completionBar" class="h-full bg-emerald-500 transition-all" style="width: 100%"></div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <span class="text-xs text-slate-400 block mb-1">Total Horas</span>
+                <span class="text-lg font-bold text-slate-200" id="totalHours">0h 0m</span>
+              </div>
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <span class="text-xs text-slate-400 block mb-1">KM Total</span>
+                <span class="text-lg font-bold text-slate-200" id="totalKmDashboard">0 km</span>
+              </div>
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <span class="text-xs text-slate-400 block mb-1">Ticket Médio</span>
+                <span class="text-lg font-bold text-indigo-300" id="avgTicket">R$ 0,00</span>
+              </div>
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <span class="text-xs text-slate-400 block mb-1">Ganho p/ Hora</span>
+                <span class="text-lg font-bold text-emerald-300" id="hourlyRate">R$ 0,00/h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SCANNER DE PRINTS -->
+    <section id="content-upload" class="tab-content hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl border border-indigo-500/20 space-y-6">
+        <div class="max-w-3xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold mb-3">
+            <i class="fa-solid fa-brain"></i> Scanner Inteligente Vision Gemini AI
+          </div>
+          <h2 class="text-2xl font-bold text-white mb-2">Upload e Leitura Automática de Prints</h2>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Selecione o aplicativo e envie o print. Se houver restrição de rede no navegador móvel, utilize a aba <b>Lançamento Manual</b> para adicionar suas corridas com facilidade.
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">1. Selecione o Aplicativo do Print:</label>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" onclick="setScanPlatform('Uber')" id="scanBtnUber" class="px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-black text-white border-indigo-500 shadow-lg shadow-indigo-500/20">
+              <span class="w-3 h-3 rounded-full bg-indigo-400"></span> Uber
+            </button>
+            <button type="button" onclick="setScanPlatform('99')" id="scanBtn99" class="px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-slate-900 text-slate-400 border-slate-800 hover:border-amber-500">
+              <span class="w-3 h-3 rounded-full bg-amber-500"></span> 99 (Junta Recompensas)
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">2. Envie o Print:</label>
+          <div class="border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-900/50 hover:bg-slate-900/80 rounded-2xl p-8 text-center transition-all cursor-pointer relative group" id="dropZone">
+            <input type="file" id="fileInput" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+            <div class="space-y-3 pointer-events-none">
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <div>
+                <p class="text-base font-semibold text-slate-200">Arraste seus prints aqui ou <span class="text-indigo-400 underline">clique para selecionar</span></p>
+                <p class="text-xs text-slate-500 mt-1">Suporta múltiplos arquivos PNG, JPG, WEBP</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="uploadLoader" class="hidden bg-indigo-950/40 border border-indigo-800/50 p-5 rounded-2xl flex items-center gap-4">
+          <div class="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <div>
+            <h4 class="font-semibold text-indigo-200 text-sm" id="loaderTitle">Analisando imagem com Gemini AI...</h4>
+            <p class="text-xs text-indigo-400" id="loaderSubtitle">Extraindo horários, valores e bônus...</p>
+          </div>
+        </div>
+
+        <div id="uploadSummary" class="hidden p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: LANÇAMENTO MANUAL (Uber, 99 e Particular) -->
+    <section id="content-particular" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Form Section -->
+        <div class="lg:col-span-1 glass-card p-6 rounded-2xl space-y-4">
+          <h3 class="font-bold text-lg text-white flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle text-emerald-400"></i> Adicionar Corrida Manual
+          </h3>
+          <form id="particularForm" onsubmit="saveManualRide(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Plataforma</label>
+              <select id="manualPlatform" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+                <option value="Uber">Uber</option>
+                <option value="99">99 Pop</option>
+                <option value="Particular">Particular / Direct</option>
+              </select>
+            </div>
+
+            <div id="clientGroup">
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Nome do Cliente (Opcional p/ App, Obrigatório p/ Particular)</label>
+              <input type="text" id="manualClient" placeholder="Ex: João Silva ou Entrega" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Data</label>
+                <input type="date" id="manualDate" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Horário</label>
+                <input type="time" id="manualTime" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Valor (R$)</label>
+                <input type="number" step="0.01" id="manualValue" required placeholder="25.00" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Distância (KM)</label>
+                <input type="number" step="0.1" id="manualKm" placeholder="5.0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Observações</label>
+              <textarea id="manualObs" rows="2" placeholder="Ex: Corrida com bônus ou Pix" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Corrida Manual
+            </button>
+          </form>
+        </div>
+
+        <!-- Calculator & Manual List -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="glass-card p-6 rounded-2xl border border-emerald-500/20">
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-emerald-400"></i> Calculadora de Preço por KM
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">KM Estimado</label>
+                <input type="number" id="calcKm" oninput="calculateEstimateFare()" placeholder="Ex: 15" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Sua Meta por KM (R$/KM)</label>
+                <input type="number" step="0.1" id="calcTargetKm" oninput="calculateEstimateFare()" value="2.50" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Sugestão de Cobrança</label>
+                <div class="h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3 flex items-center text-emerald-400 font-bold text-base" id="calcResult">R$ 0,00</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-4">Últimas Corridas Lançadas Manualmente / Particulares</h3>
+            <div id="particularRidesList" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: VEÍCULO & CUSTOS -->
+    <section id="content-vehicle" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 glass-card p-6 rounded-2xl space-y-4">
+          <h3 class="font-bold text-lg text-white flex items-center gap-2">
+            <i class="fa-solid fa-motorcycle text-amber-400"></i> Cadastro do Veículo
+          </h3>
+          <form id="vehicleForm" onsubmit="saveVehicleData(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Nome / Modelo</label>
+              <input type="text" id="vehName" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Placa</label>
+              <input type="text" id="vehPlate" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">km/L</label>
+                <input type="number" step="0.1" id="vehCons" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Preço Gasolina (R$/L)</label>
+                <input type="number" step="0.01" id="vehFuelPrice" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Manutenção (R$/KM)</label>
+              <input type="number" step="0.01" id="vehMaintPerKm" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+            </div>
+            <button type="submit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition-all">Salvar Veículo</button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+          <div class="glass-card p-6 rounded-2xl border border-amber-500/20">
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider mb-4 flex items-center justify-between">
+              <span>Odômetro Diário</span>
+              <i class="fa-solid fa-gauge-high text-amber-400"></i>
+            </h3>
+            <form onsubmit="saveOdometerLog(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">KM Inicial</label>
+                <input type="number" id="odoStart" oninput="updateOdoCalc()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">KM Final</label>
+                <input type="number" id="odoEnd" oninput="updateOdoCalc()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Total Rodado</label>
+                <div class="h-9 rounded-xl bg-slate-900 border border-slate-800 px-3 flex items-center text-amber-400 font-black text-base" id="odoTotalDisplay">0 KM</div>
+              </div>
+              <div class="sm:col-span-3">
+                <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700">Salvar Odômetro</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl space-y-4">
+            <h3 class="font-bold text-slate-200 text-sm uppercase tracking-wider">Outras Despesas (Alimentação, Aluguel, Óleo)</h3>
+            <form id="expenseForm" onsubmit="saveExpenseLog(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div>
+                <select id="expCategory" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+                  <option value="Alimentação">Alimentação</option>
+                  <option value="Aluguel/Passe Diário">Aluguel/Passe Diário</option>
+                  <option value="Troca de Óleo">Troca de Óleo</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+              <div>
+                <input type="text" id="expDesc" placeholder="Descrição" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <input type="number" step="0.01" id="expValue" placeholder="Valor R$" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+              </div>
+              <div>
+                <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs">Adicionar</button>
+              </div>
+            </form>
+            <div id="expenseList" class="space-y-2 pt-2"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: HISTÓRICO -->
+    <section id="content-history" class="tab-content hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Histórico Geral de Corridas</h2>
+            <p class="text-xs text-slate-400">Gerencie todas as corridas da Uber, 99 e Particulares</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg">Exportar CSV</button>
+            <button onclick="clearAllData()" class="px-3 py-1.5 text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg">Limpar Tudo</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          <div>
+            <input type="text" id="searchFilter" oninput="renderHistoryTable()" placeholder="Buscar..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
+          </div>
+          <div>
+            <select id="platformFilter" onchange="renderHistoryTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
+              <option value="all">Todas as Plataformas</option>
+              <option value="Uber">Uber</option>
+              <option value="99">99</option>
+              <option value="Particular">Particular</option>
+            </select>
+          </div>
+          <div>
+            <select id="typeFilter" onchange="renderHistoryTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white">
+              <option value="all">Todos os Tipos</option>
+              <option value="Corrida">Corrida Concluída</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold border-b border-slate-800">
+              <tr>
+                <th class="p-3">Data / Hora</th>
+                <th class="p-3">Plataforma</th>
+                <th class="p-3">Detalhe</th>
+                <th class="p-3">Valor (R$)</th>
+                <th class="p-3">KM</th>
+                <th class="p-3 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-slate-800/60 bg-slate-900/30"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- API KEY MODAL -->
+  <div id="apiKeyModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 border border-slate-800 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-white text-base">Chave API Gemini Vision</h3>
+        <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div>
+        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white">
+      </div>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeApiKeyModal()" class="px-4 py-2 text-xs bg-slate-800 text-slate-300 rounded-xl">Cancelar</button>
+        <button onclick="saveApiKey()" class="px-4 py-2 text-xs bg-indigo-600 text-white rounded-xl">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div id="toastContent" class="glass-card px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-3 text-sm font-semibold"></div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4m9ed7ZJeuv9BfphJy7AxLWvNvCD1oP0",
+      authDomain: "rotapro-ai.firebaseapp.com",
+      projectId: "rotapro-ai",
+      storageBucket: "rotapro-ai.firebasestorage.app",
+      messagingSenderId: "417482769725",
+      appId: "1:417482769725:web:8306edfd080b2cec9b3154"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let isSignUp = false;
+    let currentUser = null;
+
+    let appState = {
+      apiKey: localStorage.getItem('gemini_api_key') || '',
+      selectedScanPlatform: 'Uber',
+      vehicle: JSON.parse(localStorage.getItem('driver_vehicle')) || {
+        name: 'Mottu Sport TVS HLX 150',
+        plate: 'RIO-2026',
+        consumption: 38.0,
+        fuelPrice: 5.89,
+        maintPerKm: 0.08,
+        odoStart: 14925,
+        odoEnd: 15130
+      },
+      rides: JSON.parse(localStorage.getItem('driver_rides')) || [],
+      expenses: JSON.parse(localStorage.getItem('driver_expenses')) || [],
+      filterPeriod: 'today'
+    };
+
+    let platformChart = null;
+
+    function toggleAuthMode() {
+      isSignUp = !isSignUp;
+      document.getElementById('nameGroup').style.display = isSignUp ? 'block' : 'none';
+      document.getElementById('authSubmitBtn').innerText = isSignUp ? 'Criar Conta e Sincronizar' : 'Entrar na Nuvem';
+      document.getElementById('authToggleBtn').innerText = isSignUp ? 'Já tem conta? Faça login' : 'Não tem conta? Cadastre-se';
+    }
+
+    async function handleAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      const name = document.getElementById('authName').value || 'Motorista';
+      try {
+        if (isSignUp) {
+          const res = await auth.createUserWithEmailAndPassword(email, pass);
+          await res.user.updateProfile({ displayName: name });
+        } else {
+          await auth.signInWithEmailAndPassword(email, pass);
+        }
+      } catch (err) {
+        showToast('Erro: ' + err.message, 'error');
+      }
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('authOverlay').classList.add('hidden');
+        document.getElementById('welcomeUserDisplay').innerText = `Olá, ${user.displayName || 'Motorista'}!`;
+        loadUserDataFromCloud();
+      } else {
+        currentUser = null;
+        document.getElementById('authOverlay').classList.remove('hidden');
+      }
+    });
+
+    function logout() { auth.signOut(); }
+
+    async function loadUserDataFromCloud() {
+      if (!currentUser) return;
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.rides) appState.rides = data.rides;
+          if (data.expenses) appState.expenses = data.expenses;
+          if (data.vehicle) appState.vehicle = data.vehicle;
+          localStorage.setItem('driver_rides', JSON.stringify(appState.rides));
+          localStorage.setItem('driver_expenses', JSON.stringify(appState.expenses));
+          localStorage.setItem('driver_vehicle', JSON.stringify(appState.vehicle));
+        }
+      } catch (e) {}
+      loadVehicleFormValues();
+      renderDashboard();
+      renderParticularList();
+      renderExpensesList();
+      renderHistoryTable();
+    }
+
+    async function saveUserDataToCloud() {
+      localStorage.setItem('driver_rides', JSON.stringify(appState.rides));
+      localStorage.setItem('driver_expenses', JSON.stringify(appState.expenses));
+      localStorage.setItem('driver_vehicle', JSON.stringify(appState.vehicle));
+      if (!currentUser) return;
+      try {
+        await db.collection('users').doc(currentUser.uid).set({
+          rides: appState.rides,
+          expenses: appState.expenses,
+          vehicle: appState.vehicle,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (e) {}
+    }
+
+    window.onload = function() {
+      // Definir data padrão no formulário manual como o dia de hoje
+      const todayDateStr = new Date().toISOString().split('T')[0];
+      const manualDateEl = document.getElementById('manualDate');
+      if (manualDateEl) manualDateEl.value = todayDateStr;
+
+      updateApiKeyStatus();
+      loadVehicleFormValues();
+      renderDashboard();
+      renderParticularList();
+      renderExpensesList();
+      renderHistoryTable();
+
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      if (fileInput) {
+        fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files));
+      }
+    };
+
+    function setScanPlatform(platform) {
+      appState.selectedScanPlatform = platform;
+      const btnUber = document.getElementById('scanBtnUber');
+      const btn99 = document.getElementById('scanBtn99');
+      if (platform === 'Uber') {
+        btnUber.className = "px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-black text-white border-indigo-500 shadow-lg";
+        btn99.className = "px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-slate-900 text-slate-400 border-slate-800";
+      } else {
+        btn99.className = "px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-amber-500 text-black border-amber-400 font-black shadow-lg";
+        btnUber.className = "px-5 py-3 rounded-xl font-bold text-sm border flex items-center gap-2 transition-all bg-slate-900 text-slate-400 border-slate-800";
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+      document.getElementById(`content-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tab-${tabId}`).classList.add('active-tab');
+      if (tabId === 'dashboard') renderDashboard();
+    }
+
+    function openApiKeyModal() {
+      document.getElementById('geminiApiKeyInput').value = appState.apiKey;
+      document.getElementById('apiKeyModal').classList.remove('hidden');
+    }
+    function closeApiKeyModal() { document.getElementById('apiKeyModal').classList.add('hidden'); }
+    function saveApiKey() {
+      appState.apiKey = document.getElementById('geminiApiKeyInput').value.trim();
+      localStorage.setItem('gemini_api_key', appState.apiKey);
+      updateApiKeyStatus();
+      closeApiKeyModal();
+      showToast('Chave API salva!', 'success');
+    }
+    function updateApiKeyStatus() {
+      const dot = document.getElementById('apiKeyStatusDot');
+      dot.className = appState.apiKey ? "w-2 h-2 rounded-full bg-emerald-400 animate-pulse" : "w-2 h-2 rounded-full bg-rose-500";
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const content = document.getElementById('toastContent');
+      content.className = `glass-card px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-3 text-sm font-semibold border-indigo-500/30 text-indigo-200 bg-indigo-950/80`;
+      content.innerHTML = `<span>${message}</span>`;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 4000);
+    }
+
+    // Lançamento Manual (Uber, 99 e Particular)
+    function saveManualRide(e) {
+      e.preventDefault();
+      const platform = document.getElementById('manualPlatform').value;
+      const client = document.getElementById('manualClient').value;
+      const date = document.getElementById('manualDate').value;
+      const time = document.getElementById('manualTime').value;
+      const value = parseFloat(document.getElementById('manualValue').value) || 0;
+      const km = parseFloat(document.getElementById('manualKm').value) || 0;
+      const obs = document.getElementById('manualObs').value;
+
+      const signatureKey = `${platform}_${date}_${time}_${value.toFixed(2)}`;
+      if (appState.rides.some(r => r.signatureKey === signatureKey)) {
+        showToast('Esta corrida já foi cadastrada neste horário!', 'warning');
+        return;
+      }
+
+      const newRide = {
+        id: 'MANUAL-' + Date.now(),
+        signatureKey,
+        platform,
+        client: client || (platform === 'Particular' ? 'Cliente Particular' : ''),
+        date,
+        time,
+        type: 'Corrida',
+        value,
+        distanceKm: km,
+        durationMin: 0,
+        obs
+      };
+
+      appState.rides.unshift(newRide);
+      saveUserDataToCloud();
+      document.getElementById('particularForm').reset();
+      
+      // Restaurar data para hoje após resetar
+      document.getElementById('manualDate').value = new Date().toISOString().split('T')[0];
+
+      showToast(`Corrida da ${platform} salva com sucesso!`, 'success');
+      renderParticularList();
+      renderHistoryTable();
+      renderDashboard();
+    }
+
+    function renderParticularList() {
+      const container = document.getElementById('particularRidesList');
+      const manualRides = appState.rides.filter(r => r.platform === 'Particular' || r.platform === '99' || r.platform === 'Uber').slice(0, 10);
+      if (!manualRides.length) {
+        container.innerHTML = `<p class="text-xs text-slate-500 py-4">Nenhuma corrida cadastrada recentemente.</p>`;
+        return;
+      }
+      container.innerHTML = manualRides.map(r => `
+        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300">${r.platform}</span>
+              <span class="text-xs font-bold text-white">${r.client || r.type}</span>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">${r.date || ''} às ${r.time} • ${r.distanceKm} km</p>
+          </div>
+          <div class="text-right">
+            <span class="font-black text-emerald-400 text-sm">+ R$ ${r.value.toFixed(2)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function calculateEstimateFare() {
+      const km = parseFloat(document.getElementById('calcKm').value) || 0;
+      const target = parseFloat(document.getElementById('calcTargetKm').value) || 2.50;
+      document.getElementById('calcResult').innerText = `R$ ${(km * target).toFixed(2)}`;
+    }
+
+    // Scanner Gemini AI com modelo corrigido
+    async function handleFileUpload(files) {
+      if (!files || !files.length) return;
+      if (!appState.apiKey) {
+        showToast('Configure sua chave de API Gemini primeiro!', 'error');
+        openApiKeyModal();
+        return;
+      }
+
+      const loader = document.getElementById('uploadLoader');
+      const summary = document.getElementById('uploadSummary');
+      loader.classList.remove('hidden');
+      summary.classList.add('hidden');
+
+      let importedCount = 0;
+      let ignoredCount = 0;
+      const targetPlatform = appState.selectedScanPlatform || 'Uber';
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        try {
+          const base64Data = await fileToBase64(file);
+          const extractedRides = await processImageWithGemini(base64Data, file.type, targetPlatform);
+          extractedRides.forEach(ride => {
+            if (!ride.date || ride.date === '2026-10-22') {
+              ride.date = todayStr; // Atribuir data atual se o OCR não achar ou se vier o demo
+            }
+            const sigKey = `${ride.platform}_${ride.date}_${ride.time}`;
+            if (!appState.rides.some(r => r.signatureKey === sigKey)) {
+              ride.signatureKey = sigKey;
+              ride.id = 'AI-' + Math.random().toString(36).substr(2, 9);
+              appState.rides.unshift(ride);
+              importedCount++;
+            } else {
+              ignoredCount++;
+            }
+          });
+        } catch (error) {
+          showToast(`Erro ao analisar print. Use o lançamento manual se persistir.`, 'error');
+        }
+      }
+
+      loader.classList.add('hidden');
+      saveUserDataToCloud();
+      summary.classList.remove('hidden');
+      summary.innerHTML = `<p class="text-xs text-emerald-400 font-bold">Importação concluída: ${importedCount} adicionadas, ${ignoredCount} duplicadas ignoradas.</p>`;
+      showToast(`${importedCount} corridas importadas!`, 'success');
+      renderHistoryTable();
+      renderDashboard();
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.replace(/^data:(.*,)?/, ''));
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    async function processImageWithGemini(base64ImageData, mimeType, platform) {
+      const apiKey = appState.apiKey;
+      const todayStr = new Date().toISOString().split('T')[0];
+      const systemPrompt = `Extraia todas as corridas do print do aplicativo ${platform} em JSON puro: [{"platform": "${platform}", "date": "${todayStr}", "time": "18:31", "type": "Corrida", "value": 14.50, "distanceKm": 5.2, "durationMin": 12}]`;
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Analise este print" }, { inlineData: { mimeType: mimeType || "image/png", data: base64ImageData } }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          generationConfig: { responseMimeType: "application/json" }
+        })
+      });
+
+      if (!response.ok) throw new Error("Erro na API");
+      const result = await response.json();
+      const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      return rawText ? JSON.parse(rawText) : [];
+    }
+
+    function setFilterPeriod(period) {
+      appState.filterPeriod = period;
+      document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      event.target.classList.remove('bg-slate-800', 'text-slate-300');
+      event.target.classList.add('bg-indigo-600', 'text-white');
+      
+      const labels = {
+        today: 'Hoje',
+        yesterday: 'Ontem',
+        week: 'Esta Semana',
+        month: 'Este Mês',
+        all: 'Todo o Histórico'
+      };
+      document.getElementById('currentPeriodLabel').innerText = labels[period];
+
+      renderDashboard();
+    }
+
+    function getFilteredRides() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const period = appState.filterPeriod;
+
+      return appState.rides.filter(r => {
+        if (period === 'all') return true;
+        if (period === 'today') return r.date === todayStr || r.date === '2026-10-22' || !r.date;
+        if (period === 'yesterday') {
+          const d = new Date();
+          d.setDate(d.getDate() - 1);
+          const yestStr = d.toISOString().split('T')[0];
+          return r.date === yestStr || r.date === '2026-10-21';
+        }
+        return true;
+      });
+    }
+
+    function renderDashboard() {
+      const rides = getFilteredRides();
+      const v = appState.vehicle;
+      let bruto = 0, kmApp = 0, minTotal = 0, uber = 0, nine = 0, part = 0, completed = 0;
+
+      rides.forEach(r => {
+        const val = parseFloat(r.value) || 0;
+        bruto += val;
+        kmApp += parseFloat(r.distanceKm) || 0;
+        minTotal += parseFloat(r.durationMin) || 0;
+        if (r.type !== 'Cancelado') completed++;
+        if (r.platform === 'Uber') uber += val;
+        else if (r.platform === '99') nine += val;
+        else if (r.platform === 'Particular') part += val;
+      });
+
+      const kmUse = (v.odoEnd >= v.odoStart && v.odoEnd > 0) ? (v.odoEnd - v.odoStart) : kmApp;
+      const fuelCost = (kmUse / (v.consumption || 38)) * (v.fuelPrice || 5.89);
+      const maintCost = kmUse * (v.maintPerKm || 0.08);
+      const extra = appState.expenses.reduce((acc, c) => acc + c.value, 0);
+      const costs = fuelCost + maintCost + extra;
+      const lucro = bruto - costs;
+
+      document.getElementById('dashBruto').innerText = `R$ ${bruto.toFixed(2)}`;
+      document.getElementById('dashTotalCorridasCount').innerHTML = `<i class="fa-solid fa-route"></i> ${rides.length} corridas`;
+      document.getElementById('dashCustos').innerText = `R$ ${costs.toFixed(2)}`;
+      document.getElementById('dashLucro').innerText = `R$ ${lucro.toFixed(2)}`;
+      document.getElementById('dashMargemLucro').innerText = `Margem: ${bruto > 0 ? ((lucro/bruto)*100).toFixed(1) : 0}%`;
+      document.getElementById('dashRendimentoKm').innerHTML = `R$ ${kmUse > 0 ? (bruto/kmUse).toFixed(2) : '0,00'} <span class="text-xs text-slate-400">/km</span>`;
+      document.getElementById('dashLucroKm').innerText = `Lucro Líq: R$ ${kmUse > 0 ? (lucro/kmUse).toFixed(2) : '0,00'}/km`;
+
+      document.getElementById('uberTotal').innerText = `R$ ${uber.toFixed(2)}`;
+      document.getElementById('nineNineTotal').innerText = `R$ ${nine.toFixed(2)}`;
+      document.getElementById('partTotal').innerText = `R$ ${part.toFixed(2)}`;
+
+      document.getElementById('totalHours').innerText = `${Math.floor(minTotal/60)}h ${Math.round(minTotal%60)}m`;
+      document.getElementById('totalKmDashboard').innerText = `${kmUse.toFixed(1)} km`;
+      document.getElementById('avgTicket').innerText = `R$ ${rides.length ? (bruto/rides.length).toFixed(2) : '0,00'}`;
+      document.getElementById('hourlyRate').innerText = `R$ ${minTotal > 0 ? (bruto/(minTotal/60)).toFixed(2) : '0,00'}/h`;
+
+      renderVehicleBar(v, kmUse);
+      renderPlatformChart(uber, nine, part);
+    }
+
+    function renderVehicleBar(v, km) {
+      document.getElementById('vehicleQuickBar').innerHTML = `
+        <div class="glass-card p-3.5 rounded-xl flex items-center gap-3 col-span-1 md:col-span-2 border border-slate-800">
+          <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 font-bold"><i class="fa-solid fa-motorcycle text-lg"></i></div>
+          <div>
+            <h4 class="text-xs font-bold text-white">${v.name} (${v.plate || ''})</h4>
+            <p class="text-[11px] text-slate-400">Consumo: ${v.consumption} km/L • R$ ${v.fuelPrice}/L</p>
+          </div>
+        </div>
+        <div class="glass-card p-3.5 rounded-xl flex items-center justify-between border border-slate-800">
+          <span class="text-xs text-slate-400">KM Hoje</span>
+          <span class="text-sm font-bold text-amber-300">${km.toFixed(0)} KM</span>
+        </div>
+        <div class="glass-card p-3.5 rounded-xl flex items-center justify-between border border-slate-800">
+          <span class="text-xs text-slate-400">Custo Combustível</span>
+          <span class="text-sm font-bold text-rose-400">R$ ${(v.fuelPrice/v.consumption).toFixed(2)}/km</span>
+        </div>`;
+    }
+
+    function renderPlatformChart(u, n, p) {
+      const ctx = document.getElementById('chartPlatforms').getContext('2d');
+      if (platformChart) platformChart.destroy();
+      platformChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Uber', '99', 'Particular'],
+          datasets: [{ data: [u||0.1, n||0.1, p||0.1], backgroundColor: ['#6366f1', '#ff8c00', '#10b981'], borderWidth: 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } }, cutout: '70%' }
+      });
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('historyTableBody');
+      const search = document.getElementById('searchFilter').value.toLowerCase();
+      const platform = document.getElementById('platformFilter').value;
+      const type = document.getElementById('typeFilter').value;
+
+      const filtered = appState.rides.filter(r => {
+        const matchSearch = (r.time||'').includes(search) || (r.platform||'').toLowerCase().includes(search) || (r.client||'').toLowerCase().includes(search);
+        const matchPlatform = platform === 'all' || r.platform === platform;
+        const matchType = type === 'all' || r.type === type;
+        return matchSearch && matchPlatform && matchType;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => `
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-3">${r.date || ''} <span class="text-indigo-400 font-bold">${r.time || ''}</span></td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-200">${r.platform}</span></td>
+          <td class="p-3">${r.type} ${r.client ? `(${r.client})` : ''}</td>
+          <td class="p-3 font-bold text-white">R$ ${(parseFloat(r.value)||0).toFixed(2)}</td>
+          <td class="p-3 text-slate-400">${r.distanceKm || 0} km</td>
+          <td class="p-3 text-right"><button onclick="deleteRide('${r.id}')" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button></td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteRide(id) {
+      appState.rides = appState.rides.filter(r => r.id !== id);
+      saveUserDataToCloud();
+      renderHistoryTable();
+      renderDashboard();
+      showToast('Excluído com sucesso.', 'warning');
+    }
+
+    function clearAllData() {
+      if (confirm('Deseja limpar todos os dados?')) {
+        appState.rides = [];
+        appState.expenses = [];
+        saveUserDataToCloud();
+        renderHistoryTable();
+        renderDashboard();
+        showToast('Dados limpos.', 'info');
+      }
+    }
+
+    function loadVehicleFormValues() {
+      const v = appState.vehicle;
+      if (!v) return;
+      document.getElementById('vehName').value = v.name || '';
+      document.getElementById('vehPlate').value = v.plate || '';
+      document.getElementById('vehCons').value = v.consumption || '';
+      document.getElementById('vehFuelPrice').value = v.fuelPrice || '';
+      document.getElementById('vehMaintPerKm').value = v.maintPerKm || '';
+      document.getElementById('odoStart').value = v.odoStart || '';
+      document.getElementById('odoEnd').value = v.odoEnd || '';
+    }
+
+    function saveVehicleData(e) {
+      e.preventDefault();
+      appState.vehicle.name = document.getElementById('vehName').value;
+      appState.vehicle.plate = document.getElementById('vehPlate').value;
+      appState.vehicle.consumption = parseFloat(document.getElementById('vehCons').value) || 30;
+      appState.vehicle.fuelPrice = parseFloat(document.getElementById('vehFuelPrice').value) || 5.89;
+      appState.vehicle.maintPerKm = parseFloat(document.getElementById('vehMaintPerKm').value) || 0.08;
+      saveUserDataToCloud();
+      showToast('Veículo salvo!', 'success');
+      renderDashboard();
+    }
+
+    function updateOdoCalc() {
+      const start = parseFloat(document.getElementById('odoStart').value) || 0;
+      const end = parseFloat(document.getElementById('odoEnd').value) || 0;
+      document.getElementById('odoTotalDisplay').innerText = `${end >= start ? (end - start) : 0} KM`;
+    }
+
+    function saveOdometerLog(e) {
+      e.preventDefault();
+      appState.vehicle.odoStart = parseFloat(document.getElementById('odoStart').value) || 0;
+      appState.vehicle.odoEnd = parseFloat(document.getElementById('odoEnd').value) || 0;
+      saveUserDataToCloud();
+      showToast('Odômetro salvo!', 'success');
+      renderDashboard();
+    }
+
+    function saveExpenseLog(e) {
+      e.preventDefault();
+      appState.expenses.unshift({
+        id: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        category: document.getElementById('expCategory').value,
+        desc: document.getElementById('expDesc').value,
+        value: parseFloat(document.getElementById('expValue').value) || 0
+      });
+      saveUserDataToCloud();
+      document.getElementById('expenseForm').reset();
+      showToast('Despesa adicionada!', 'success');
+      renderExpensesList();
+      renderDashboard();
+    }
+
+    function renderExpensesList() {
+      const container = document.getElementById('expenseList');
+      if (!appState.expenses.length) {
+        container.innerHTML = `<p class="text-xs text-slate-500">Nenhuma despesa extra.</p>`;
+        return;
+      }
+      container.innerHTML = appState.expenses.map(exp => `
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between text-xs">
+          <div><span class="text-rose-400">[${exp.category}]</span> ${exp.desc}</div>
+          <div class="font-bold text-rose-400">- R$ ${exp.value.toFixed(2)}</div>
+        </div>
+      `).join('');
+    }
+
+    function exportToCSV() {
+      if (!appState.rides.length) return showToast('Sem dados para exportar', 'warning');
+      let csv = 'Data,Horario,Plataforma,Tipo,Valor,KM\n';
+      appState.rides.forEach(r => csv += `"${r.date}","${r.time}","${r.platform}","${r.type}",${r.value},${r.distanceKm}\n`);
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'corridas.csv';
+      link.click();
+    }
+
+    function loadDemoData() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      appState.rides = [
+        { id: '1', platform: 'Uber', date: todayStr, time: '22:02', type: 'Corrida', value: 13.56, distanceKm: 2.1 },
+        { id: '2', platform: '99', date: todayStr, time: '21:00', type: 'Corrida', value: 15.00, distanceKm: 4.0 },
+        { id: '3', platform: 'Particular', date: todayStr, time: '15:30', client: 'Entrega Direct', type: 'Corrida', value: 35.00, distanceKm: 12.0 }
+      ];
+      saveUserDataToCloud();
+      renderDashboard();
+      renderHistoryTable();
+      renderParticularList();
+      showToast('Dados de exemplo carregados para hoje!', 'success');
+    }
+  </script>
+</body>
+</html>
